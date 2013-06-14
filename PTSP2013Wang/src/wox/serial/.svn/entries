@@ -1,0 +1,133 @@
+10
+
+dir
+0
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/wox/serial
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
+add
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+877838cd-bf58-0410-90ef-fec0a358d40a
+
+SimpleReader.java
+file
+
+
+
+add
+
+WriterTest.java
+file
+
+
+
+add
+
+Util.java
+file
+
+
+
+add
+
+Serial.java
+file
+
+
+
+add
+
+ShadowTest.java
+file
+
+
+
+add
+
+SimpleWriter.java
+file
+
+
+
+add
+
+ObjectReader.java
+file
+
+
+
+add
+
+EasyTest.java
+file
+
+
+
+add
+
+AccessTest.java
+file
+
+
+
+add
+
+Easy.java
+file
+
+
+
+add
+
+EncodeBase64.java
+file
+
+
+
+add
+
+ObjectWriter.java
+file
+
+
+
+add
+
+TestObject.java
+file
+
+
+
+add
+
+ArrayListTest.java
+file
+
+
+
+add
+
+ReadTest.java
+file
+
+
+
+add
+
