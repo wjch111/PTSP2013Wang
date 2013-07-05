@@ -284,7 +284,7 @@ public class ExecFromData extends Exec
         m_mapNames = new String[]{"maps/ptsp_map01.map", "maps/ptsp_map02.map"};  //Set here the name of the map to play in.
         m_controllerName = "controllers.greedy.GreedyController"; //Set here the controller name. Leave it to null to play with KeyController.
         //m_controllerName = "controllers.random.RandomController";
-        m_visibility = false;//true;//true; //Set here if the graphics must be displayed or not (for those modes where graphics are allowed).
+        m_visibility = true;//false;//true; //Set here if the graphics must be displayed or not (for those modes where graphics are allowed).
         m_writeOutput = false; //Indicate if the actions must be saved to a file after the end of the game.
         m_verbose = false;
         //m_warmUpTime = 750; //Change this to modify the wait time (in milliseconds) before starting the game in a visual mode

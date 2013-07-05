@@ -85,6 +85,8 @@ public class ExecReplay extends Exec
         m_verbose = true;
         //m_warmUpTime = 750; //Change this to modify the wait time (in milliseconds) before starting the game in a visual mode
 
+        System.out.println("perfect");
+        
         /////// 1. Executes a replay.
         /////// Note: using a delay 0: quickest, 1:quickest (seeing something!), PTSPConstants.DELAY: human play speed,
         // //PTSPConstants.ACTION_TIME_MS: max. controller delay
