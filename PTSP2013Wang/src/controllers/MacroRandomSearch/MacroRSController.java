@@ -1,9 +1,11 @@
 package controllers.MacroRandomSearch;
 
+import java.awt.Graphics2D;
+
+import controllers.utils.DebugTools;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.graph.Graph;
-import java.awt.*;
 
 /**
  * PTSP-Competition
@@ -63,6 +65,7 @@ public class MacroRSController extends Controller {
         m_lastMacroAction = 0;
         m_tspGraph.solve();
         m_bestRoute = m_tspGraph.getBestPath();
+        DebugTools.showSeq(m_bestRoute);
     }
 
     /**
@@ -118,6 +121,8 @@ public class MacroRSController extends Controller {
                 throw new RuntimeException("This should not be happening: " + m_currentMacroAction);
             }
         }
+        
+        
 
         return nextMacroAction;
     }
