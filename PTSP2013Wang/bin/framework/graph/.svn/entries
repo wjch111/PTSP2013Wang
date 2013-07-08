@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin/framework/graph
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/framework/graph
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,129 +26,38 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
-PathCH.class
+Path.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Path.class
+Graph.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-PathCHComparator.class
+Edge.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Graph.class
+PathFinder.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Edge.class
+Node.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
-
-PathFinder.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-NodeComparatorG.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-NodeComparatorH.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-Node.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
 

@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin/framework
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/framework
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,13 +26,6 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
-utils
-dir
-
-
-
-add
-
 graph
 dir
 
@@ -40,49 +33,35 @@ dir
 
 add
 
-ExecReplay.class
+ExecSync.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ExecSync.class
+ExecReplay.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ExecFromData.class
+ExecFromData.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
 core
+dir
+
+
+
+add
+
+utils
 dir
 
 

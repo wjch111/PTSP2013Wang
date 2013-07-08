@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin/framework/utils
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/framework/utils
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,101 +26,38 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
-MapArchitect$ArchitectFrame$1.class
+MapArchitect.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-MapArchitect.class
+MapConverter.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-MapConverter.class
+JEasyFrame.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-JEasyFrame.class
+Vector2d.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-File2String.class
+File2String.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
-
-Vector2d.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-MapArchitect$ArchitectFrame.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
 

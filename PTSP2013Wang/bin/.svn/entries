@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,6 +26,13 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
+controllers
+dir
+
+
+
+add
+
 wox
 dir
 
@@ -34,13 +41,6 @@ dir
 add
 
 framework
-dir
-
-
-
-add
-
-controllers
 dir
 
 

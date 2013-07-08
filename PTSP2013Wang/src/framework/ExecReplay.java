@@ -1,5 +1,8 @@
 package framework;
-import framework.core.*;
+import controllers.utils.DebugTools;
+import framework.core.Exec;
+import framework.core.Game;
+import framework.core.PTSPView;
 import framework.utils.JEasyFrame;
 
 /**
@@ -78,7 +81,8 @@ public class ExecReplay extends Exec
      */
     public static void main(String[] args)
     {
-
+    	DebugTools dbg = new DebugTools();
+    	dbg.debug();
         m_mapName = "maps/ptsp_map01.map";  //Set here the name of the map to play in.
         m_actionFilename = "example_route_map01.txt"; //Indicate here the name of the file with the actions saved TO SEE a replay.
         m_visibility = true; //Set here if the graphics must be displayed or not (for those modes where graphics are allowed).

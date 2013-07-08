@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin/controllers/WoxController
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/controllers/WoxController
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,33 +26,19 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
-WoxController.class
+Bias.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Bias.class
+WoxController.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
 evolved.xml
 file

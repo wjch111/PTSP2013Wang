@@ -2,7 +2,7 @@
 
 dir
 0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/bin/wox/serial
+svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/wox/serial
 svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
 add
 
@@ -26,283 +26,108 @@ add
 
 877838cd-bf58-0410-90ef-fec0a358d40a
 
-ObjectWriter.class
+SimpleReader.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-TestObject.class
+WriterTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-TestObject$Inner.class
+Util.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ArrayListTest.class
+Serial.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ReadTest.class
+ShadowTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-WriterTest.class
+SimpleWriter.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-SimpleReader.class
+ObjectReader.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Util.class
+EasyTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-Serial.class
+AccessTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-AccessTest$Sub.class
+Easy.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ShadowTest$X.class
+EncodeBase64.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ShadowTest$Y.class
+ObjectWriter.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-AccessTest$Super.class
+TestObject.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-ShadowTest.class
+ArrayListTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
 
-SimpleWriter.class
+ReadTest.java
 file
 
 
 
 add
-
-
-
-
-
-has-props
-has-prop-mods
-
-ObjectReader.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-Easy.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-EasyTest.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-AccessTest.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
-
-EncodeBase64.class
-file
-
-
-
-add
-
-
-
-
-
-has-props
-has-prop-mods
 
