@@ -66,6 +66,10 @@ public class MacroRSController extends Controller {
         m_tspGraph.solve();
         m_bestRoute = m_tspGraph.getBestPath();
         DebugTools.showSeq(m_bestRoute);
+        for(int i : m_bestRoute){
+        	
+        	
+        }
     }
 
     /**

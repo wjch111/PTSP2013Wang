@@ -112,6 +112,7 @@ public class ExecSync extends Exec
 
             //Advance the game.
             int actionToExecute = m_controller.getAction(m_game.getCopy(), due);
+            DebugTools.debug(""+actionToExecute);
 
             //Exceeded time
             long now = System.currentTimeMillis();
@@ -282,10 +283,13 @@ public class ExecSync extends Exec
         m_mapNames = new String[]{"maps/ptsp_map08.map"};//,"maps/ptsp_map02.map","maps/ptsp_map19.map","maps/ptsp_map24.map","maps/ptsp_map35.map","maps/ptsp_map40.map","maps/ptsp_map45.map","maps/ptsp_map56.map","maps/ptsp_map61.map"}; //In an array, to play in mutiple maps with runGames().
 
         //m_controllerName = "controllers.greedy.GreedyController"; //Set here the controller name.
-        m_controllerName = "controllers.MacroRandomSearch.MacroRSController"; //Set here the controller name.
+        //m_controllerName = "controllers.MacroRandomSearch.MacroRSController"; //Set here the controller name.
         //m_controllerName = "controllers.lineofsight.LineOfSight";
         //m_controllerName = "controllers.random.RandomController";
         //m_controllerName = "controllers.WoxController.WoxController"; //Set here the controller name. Leave it to null to play with KeyController.
+        
+        m_controllerName = "controllers.momcts.ExpController";
+        
         m_visibility = true;//Set here if the graphics must be displayed or not (for those modes where graphics are allowed).
         m_writeOutput = false;//true;//Indicate if the actions must be saved to a file after the end of the game (the file name will be the current date and time)..
         m_verbose = true;
@@ -297,7 +301,7 @@ public class ExecSync extends Exec
         //playGame(delay);
 
         /////// 2. Executes one game.
-        int delay = 1;  //1: quickest; PTSPConstants.DELAY: human play speed, PTSPConstants.ACTION_TIME_MS: max. controller delay
+        int delay = PTSPConstants.ACTION_TIME_MS;  //1: quickest; PTSPConstants.DELAY: human play speed, PTSPConstants.ACTION_TIME_MS: max. controller delay
         runGame(m_visibility, delay);
 
         ////// 3. Executes N games (numMaps x numTrials), graphics disabled.
