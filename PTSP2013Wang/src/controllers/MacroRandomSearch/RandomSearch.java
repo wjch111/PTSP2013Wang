@@ -214,7 +214,6 @@ public class RandomSearch
      */
     public static double scoreGame()
     {
-
         int timeSpent = 0;
         double score = 0;
         if(m_nextPickups == null)

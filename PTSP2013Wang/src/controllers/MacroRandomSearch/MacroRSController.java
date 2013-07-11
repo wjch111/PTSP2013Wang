@@ -1,6 +1,7 @@
 package controllers.MacroRandomSearch;
 
 import java.awt.Graphics2D;
+import java.util.Vector;
 
 import controllers.utils.DebugTools;
 import framework.core.Controller;
@@ -49,6 +50,11 @@ public class MacroRSController extends Controller {
      *  Last macro action to be executed.
      */
     private int m_lastMacroAction;
+    
+    /**
+     * Record the number of waypoints left to visit
+     */
+    private int wptVistNb;
 
     /**
      * Constructor of the controller
@@ -65,11 +71,7 @@ public class MacroRSController extends Controller {
         m_lastMacroAction = 0;
         m_tspGraph.solve();
         m_bestRoute = m_tspGraph.getBestPath();
-        DebugTools.showSeq(m_bestRoute);
-        for(int i : m_bestRoute){
-        	
-        	
-        }
+        wptVistNb = a_game.getWaypointsLeft();
     }
 
     /**
@@ -81,9 +83,15 @@ public class MacroRSController extends Controller {
     @Override
     public int getAction(Game a_game, long a_timeDue)
     {
-        int cycle = a_game.getTotalTime();
+    	int cycle = a_game.getTotalTime();
         int nextMacroAction;
 
+        if(wptVistNb != a_game.getWaypointsLeft()){
+        	DebugTools.showSeq(new Vector(a_game.getVisitOrder()));	
+        	wptVistNb = a_game.getWaypointsLeft();
+        }
+        
+        
         if(cycle == 0)
         {
             //First cycle of a match is special, we need to execute any action to start looking for the next one.
@@ -125,8 +133,6 @@ public class MacroRSController extends Controller {
                 throw new RuntimeException("This should not be happening: " + m_currentMacroAction);
             }
         }
-        
-        
 
         return nextMacroAction;
     }
