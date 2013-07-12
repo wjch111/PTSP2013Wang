@@ -8,7 +8,11 @@ public class DebugTools {
 	}
 	
 	public static void debug(String s){
-		System.out.println(s);
+		System.out.println("="+s+"=");
+	}
+	
+	public static void debug(Object s){
+		debug(""+s);
 	}
 	
 	public static void showSeq(Vector<Integer> is){

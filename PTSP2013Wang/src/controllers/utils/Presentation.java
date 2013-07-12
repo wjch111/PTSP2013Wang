@@ -1,7 +1,16 @@
 package controllers.utils;
 
+import java.text.NumberFormat;
 import java.util.Vector;
 
+/**
+ * This class contains all functions that are used to facilitate the presentation
+ * of strings and numbers in console mode of java programs
+ * @author wj
+ * @date created on 2013/07/11
+ * @date modified on 2013/07/12
+ *
+ */
 public class Presentation {
 	public static void showSeq(Vector seq){
 		showSeq(seq, "\t");
@@ -53,6 +62,25 @@ public class Presentation {
 		System.out.println();
 	}
 	
+	public static void spr(){
+		spr("-");
+	}
+	
+	/**
+	 * Given a decimal number, show the decimal with accuracy to indicated decimal places
+	 * @param n the number to be shown
+	 * @param precision the number of decimals to show
+	 * @return
+	 */
+	public static String ndigits(double nb, int precision){
+		NumberFormat ddf1=NumberFormat.getNumberInstance() ;
+		ddf1.setMaximumFractionDigits(precision);
+		return ddf1.format(nb);
+	}
+	
+	public static String ndigits(double nb){
+		return ndigits(nb,2);
+	}
 	
 	public static void main(String[] args){
 		double[] is = {1,2,3,4,5};
