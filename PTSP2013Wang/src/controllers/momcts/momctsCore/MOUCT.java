@@ -43,6 +43,7 @@ public class MOUCT {
 	 * The nbs map stores the total number of visits of each type
 	 */
 	private HashMap<String, Double> nbs;
+		
 	
 	/**
 	 * Define several default reward types
@@ -149,6 +150,26 @@ public class MOUCT {
 		if(r == null) return 0;
 		if(n !=0 ) return r/n;
 		else return 0;
+	}
+
+	
+	/**
+	 * Update the RAVE(Rapid Action Value Estimation) values of the indicated action of type rwdType
+	 * @param rwdType
+	 * @param a		The action whose RAVE is to be updated
+	 * @param r
+	 * @param discount
+	 */
+	public void incrementRAVE(int a, String rwdType, double r, double discount){
+		incrementRwd(rwdType+"_RAVE"+a, r, discount);
+	}
+	
+	public void incrementRAVE(int a, String rwdType, double r){
+		incrementRwd(rwdType+"_RAVE"+a, r, 1.0);
+	}
+	
+	public double getRAVE(int a, String rwdType){
+		return avgR(rwdType+"_RAVE"+a);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package controllers.momcts.momctsCore;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import controllers.utils.SetOperation;
@@ -15,9 +16,57 @@ import controllers.utils.SetOperation;
  * @date	modified on 2013/07/12
  */
 public abstract class MOMCTS {
-	private double pwConstant;
+	private double pwConst;
+	@SuppressWarnings("unused")
+	private HashMap<String,Double> EvEConsts;
 	
-	//TODO RAVE rank, UCB rank
+	public double getEvEConst(String rwdType){
+		return SetOperation.getDoubleValue(EvEConsts, rwdType);
+	}
+	
+	//TODO MOucb, MOucb+RaveRanks
+	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType, double eveConst){
+		Vector<Double> rks = new Vector<Double>();
+		double totNb=0;
+		for(MOUCT s: sonNodes){
+			totNb += s.getNb(rwdType);
+		}
+		for(MOUCT s: sonNodes){
+			double rk = s.avgR(rwdType)+ eveConst*Math.sqrt(Math.log10(totNb)/s.getNb(rwdType));
+			rks.add(rk);
+		}
+		return rks;	
+	}
+	
+	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType){
+		return UCBRanks(sonNodes, rwdType, getEvEConst(rwdType));
+	}
+	
+	public MOUCT bestUCB(Vector<MOUCT> sonNodes, String rwdType){
+		return SetOperation.maxItem(sonNodes, UCBRanks(sonNodes, rwdType));
+	}
+	
+	/**
+	 * Return the RAVE values of each action in sonNodes.
+	 * @param sonNodes
+	 * @param rwdType
+	 * @return
+	 */
+	protected Vector<Double> RAVERanks(Vector<MOUCT> sonNodes, String rwdType){
+		Vector<Double> rks = new Vector<Double>();
+		for(MOUCT s:sonNodes){
+			rks.add(root.getRAVE(s.getAction(), rwdType));
+		}
+		return rks;
+	}
+	
+	protected Vector<Double> UcbRaveRanks(Vector<MOUCT> sonNodes, String rwdType){
+		Vector<Double> rks = new Vector<Double>();
+		
+		
+		
+		return rks;
+	}
 	
 	
 	/**
@@ -47,9 +96,13 @@ public abstract class MOMCTS {
 	 */
 	public abstract Vector<Double> evaluateSeq(Vector<Integer> actSeq);
 	
+	
+	
+	
 	/**
 	 * Simulate one tree-walk in MOMCTS
 	 */
+	//TODO
 	public void playOneSequence(boolean pwEnabled, String nbType){
 		//The sequence of nodes visited during the tree walk
 		Vector<MOUCT> nodes = new Vector<MOUCT>();
@@ -61,8 +114,8 @@ public abstract class MOMCTS {
 			
 			boolean newSonToAdd = false;
 			if(pwEnabled) {
-				int n1 = (int) Math.pow(currNd.getNb(nbType), pwConstant);
-				int n2 = (int) Math.pow(currNd.getNb(nbType)+1, pwConstant);
+				int n1 = (int) Math.pow(currNd.getNb(nbType), pwConst);
+				int n2 = (int) Math.pow(currNd.getNb(nbType)+1, pwConst);
 				if(n2>n1 && currNd.getSons().size() < candAs.size()) newSonToAdd = true;
 			}
 			
