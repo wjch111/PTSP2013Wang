@@ -35,7 +35,20 @@ public class SetOperation {
 			if(!mp.containsKey(el)) compSet.add(el);
 		}
 		return compSet;
-    }	
+    }
+	
+	/**
+	 * Return the elements indicated by inds in v
+	 * @param v
+	 * @param inds
+	 */
+	public static <T> Vector<T> getElements(Vector<T> v, Vector<Integer> inds){
+		Vector<T> elems = new Vector<T>();
+		for(int i : inds){
+			elems.add(v.get(i));
+		}
+		return elems;
+	}
 	
 	/**
 	 * An example class to define equals() method
@@ -165,13 +178,19 @@ public class SetOperation {
 		return getBestItem(mp, false);
 	}
 	
+	/**
+	 * Return the value of key k in map, if k does not exist in map, then return 0.0
+	 * @param map
+	 * @param k
+	 * @return
+	 */
 	public static <K,Double> double getDoubleValue(Map<K,Double> map, K k){
 		Double v = map.get(k);
 		if(v == null) return 0.0;
 		else return (java.lang.Double) v;
 	}
 
-	//---------Vector Operators-----------
+	//---------Vector arithmatic Operators-----------
 	/**
 	 * Calculate addition of vectors a and b
 	 * @param a
@@ -180,23 +199,163 @@ public class SetOperation {
 	 * @return
 	 */
 	@SuppressWarnings("hiding")
-	public static <Double> Vector<Double> adds(Vector<Double> as, Vector<Double> bs){
+	public static Vector<Double> adds(Vector<Double> as, Vector<Double> bs){
 		if(as.size()!=bs.size()) return null;
 		Vector<Double> addition = new Vector<Double>();
 		for(int i=0; i<as.size();i++){
 			BigDecimal a = new BigDecimal(as.get(i).toString());
 			BigDecimal b = new BigDecimal(bs.get(i).toString());
 			BigDecimal sum = a.add(b);
-			addition.add((Double) java.lang.Double.valueOf(sum.toString()));//Double.valueOf(sum));
+			addition.add(java.lang.Double.valueOf(sum.toString()));//Double.valueOf(sum));
 		}
 		return addition;
 	}
 	
+	/**
+	 * Calculate the dot product between vector as and bs
+	 * @param as
+	 * @param bs
+	 * @assure a and b should have the same size
+	 * @return
+	 */
+	public static Vector<Double> muls(Vector<Double> as, Vector<Double> bs){
+		if(as.size()!=bs.size()) return null;
+		Vector<Double> multiplication = new Vector<Double>();
+		for(int i=0; i< as.size();i++){
+			BigDecimal a = new BigDecimal(as.get(i).toString());
+			BigDecimal b = new BigDecimal(bs.get(i).toString());
+			multiplication.add(java.lang.Double.valueOf(a.multiply(b).toString()));
+		}
+		return multiplication;
+	}
 	
-	//---------end of Vector Operators-----------
+	public static Vector<Double> muls(Vector<Double> as, double b){
+		Vector<Double> multiplication = new Vector<Double>();
+		for(int i=0; i< as.size();i++){
+			multiplication.add(as.get(i)*b);
+		}
+		return multiplication;
+	}
 	
+	//---------end of Vector arithmatic Operators-----------
 	
+	//---------vector operations----------
+	public static <T> T pop(Vector<T> v, int elemInd){
+		T elem = v.get(elemInd);
+		v.remove(elemInd);
+		return elem;
+	}
 	
+	public static <T> T popFront(Vector<T> v){
+		return pop(v, 0);
+	}
+	
+	public static <T> T popEnd(Vector<T> v){
+		return pop(v, v.size()-1);
+	}
+	
+	public static <T> Vector<T> subSeq(Vector<T> v, int beginInd, int rangeLength){
+		Vector<T> subS = new Vector<T>();
+		int initPos = Math.max(0, beginInd);
+		int endPos = Math.min(v.size(), initPos+rangeLength);
+		for(int i= initPos; i< endPos; i++){
+			subS.add(v.get(i));
+		}
+		return subS;
+	}
+	
+	public static <T> Vector<T> subSeq(Vector<T> v, int beginInd){
+		return subSeq(v, beginInd, v.size());
+	}
+	
+	public static <T> Vector<T> firstNElements(Vector<T> v, int n){
+		return subSeq(v, 0, n);
+	}
+	
+	public static <T> boolean exists(Vector<T> vt, int pos){
+		if(pos >= 0 && pos < vt.size()){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//---------end of vector operations-----------
+
+	//---------matrix operations----------
+	public static <T> Vector<Vector<T>> matrixOnes(int rowSz, int colSz, T initV){
+		Vector<Vector<T>> mtr = new Vector<Vector<T>>();
+		if(colSz == 0) colSz = rowSz;
+		for(int i=0; i<rowSz; i++){
+			Vector<T> oneRow = new Vector<T>();
+			for(int j=0; j<colSz; j++){
+				oneRow.add(initV);
+			}
+			mtr.add(oneRow);
+		}
+		return mtr;
+	}
+	
+	public static <T> Vector<Vector<T>> matrixOnes(int rowSz, T initV){
+		return matrixOnes(rowSz, rowSz, initV);
+	}
+	
+	/**
+	 * Check if element (i,j) exists in matrix mx
+	 * @return
+	 */
+	public static <T> boolean exists(Vector<Vector<T>> mx, int row, int col){
+		if(row >= 0 && row < mx.size() ){
+			return exists(mx.get(row),col);
+		} else {
+			return false;
+		}
+	}
+	
+	public static <T> void assignMatrix(Vector<Vector<T>> mx, int row, int col, T value){
+		if(exists(mx,row, col)) {
+			Vector<T> line = mx.get(row);
+			line.set(col, value);
+		}		
+	}
+	
+	public static <T> Vector<T> extractCol(Vector<Vector<T>> mx, int colNb){
+		Vector<T> colN = new Vector<T>();
+		for(Vector<T> line : mx){
+			colN.add((T) pop(line, colNb));
+		}
+		return colN;	
+	}
+	
+	/**
+	 * @assure that all rows in mx have the same size 
+	 * @param mx
+	 * @return the transposation of matrix mx
+	 */
+	public static <T> Vector<Vector<T>> transposeMatrix(Vector<Vector<T>> mx){
+		Vector<Vector<T>> trMt = new Vector<Vector<T>>();
+		if(mx.size()==0) return trMt;
+		int trRowSz = mx.get(0).size();
+		trMt = matrixOnes(trRowSz, mx.size(), (T)new Object());
+		for(int i=0; i< mx.size(); i++)
+			for(int j=0; j< mx.get(i).size(); j++)
+				assignMatrix(trMt, j, i, mx.get(i).get(j));
+		
+		return trMt;
+	}
+	
+	public static <T> Vector<Vector<T>> duplicateMatrix(Vector<Vector<T>> mx){
+		Vector<Vector<T>> dupMt = new Vector<Vector<T>>();
+		for(Vector<T> row : mx){
+			Vector<T> newRow = new Vector<T>();
+			for(T elem : row){
+				newRow.add(elem);
+			}
+			dupMt.add(newRow);
+		}
+		return dupMt;
+	}
+	
+	//---------end of matrix operations-----------
 	
 	
 	//---------Test Programs--------------
@@ -237,10 +396,19 @@ public class SetOperation {
 	public static void main(String[] args){
 		SetOperation st = new SetOperation();
 		//st.testSort();
-		double[] as = {1.234324232323,2.3,3.4};
-		double[] bs = {2.2,3.3,4.4};
-		Vector<Double> ds = adds(Transformation.doubleAry2Vec(as),Transformation.doubleAry2Vec(bs));
-		System.out.println(ds);
+		double[] as = {1.1,2.3,3.4};
+		double[] bs = {1.1,2.3,3.4};
+		Vector<Double> av = Transformation.doubleAry2Vec(as);
+		Vector<Double> bv = Transformation.doubleAry2Vec(bs);
+		Vector<Vector<Double>> mx = new Vector<Vector<Double>>();
+		mx.add(av);
+		mx.add(bv);
+		
+		Map<Vector<Double>, Boolean> mp = new HashMap<Vector<Double>, Boolean>();
+		mp.put(av, true);
+		
+		System.out.println(mp.containsKey(bv));
+
 	}
 	
 }

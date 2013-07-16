@@ -3,7 +3,7 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
-import controllers.utils.DebugTools;
+import controllers.utils.Debug;
 import controllers.utils.Presentation;
 
 
@@ -170,6 +170,10 @@ public class MOUCT {
 	
 	public double getRAVE(int a, String rwdType){
 		return avgR(rwdType+"_RAVE"+a);
+	}
+	
+	public double getRAVEnb(int a, String rwdType){
+		return nbs.get(rwdType+"_RAVE"+a);
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 package framework;
-import controllers.utils.DebugTools;
+import controllers.utils.Debug;
 import framework.core.Exec;
 import framework.core.Game;
 import framework.core.PTSPView;
@@ -81,7 +81,7 @@ public class ExecReplay extends Exec
      */
     public static void main(String[] args)
     {
-    	DebugTools dbg = new DebugTools();
+    	Debug dbg = new Debug();
     	dbg.debug();
         m_mapName = "maps/ptsp_map01.map";  //Set here the name of the map to play in.
         m_actionFilename = "example_route_map01.txt"; //Indicate here the name of the file with the actions saved TO SEE a replay.

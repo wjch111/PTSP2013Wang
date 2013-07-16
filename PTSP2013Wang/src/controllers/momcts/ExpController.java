@@ -2,7 +2,7 @@ package controllers.momcts;
 
 import java.util.Random;
 
-import controllers.utils.DebugTools;
+import controllers.utils.Debug;
 
 import framework.core.Controller;
 import framework.core.Game;

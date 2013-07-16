@@ -3,7 +3,7 @@ package controllers.MacroRandomSearch;
 import java.awt.Graphics2D;
 import java.util.Vector;
 
-import controllers.utils.DebugTools;
+import controllers.utils.Debug;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.graph.Graph;
@@ -87,7 +87,7 @@ public class MacroRSController extends Controller {
         int nextMacroAction;
 
         if(wptVistNb != a_game.getWaypointsLeft()){
-        	DebugTools.showSeq(new Vector(a_game.getVisitOrder()));	
+        	Debug.showSeq(new Vector(a_game.getVisitOrder()));	
         	wptVistNb = a_game.getWaypointsLeft();
         }
         

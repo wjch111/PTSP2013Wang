@@ -12,8 +12,11 @@ import java.util.Vector;
  *
  */
 public class Presentation {
+	public static String defElemSep = "\t";
+	public static String defLineSep = "\n";
+	
 	public static void showSeq(Vector seq){
-		showSeq(seq, "\t");
+		showSeq(seq, defElemSep);
 	}
 	
 	public static void showSeq(Vector seq, String sp){
@@ -24,7 +27,7 @@ public class Presentation {
 	}
 	
 	public static void showSeqln(Vector seq){
-		showSeqln(seq, "\t");
+		showSeqln(seq, defElemSep);
 	}
 	
 	public static void showSeqln(Vector seq, String sp){
@@ -65,6 +68,27 @@ public class Presentation {
 	public static void spr(){
 		spr("-");
 	}
+	
+	public static <T> void showMatrix(Vector<Vector<T>> mx, String elemSep, String lineSep){
+		for(int i=0; i< mx.size(); i++){
+			if(i!=0) System.out.print(lineSep);
+			Vector<T> line = mx.get(i);
+			for(int j=0; j< line.size();j++ ){
+				if(j!=0) System.out.print(elemSep);
+				System.out.print(line.get(j));
+			}
+		}
+		System.out.println();
+	}
+	
+	public static <T> void showMatrix(Vector<Vector<T>> mx, String elemSep){
+		showMatrix(mx, elemSep, defLineSep);
+	}
+	
+	public static <T> void showMatrix(Vector<Vector<T>> mx){
+		showMatrix(mx, defElemSep);
+	}
+	
 	
 	/**
 	 * Given a decimal number, show the decimal with accuracy to indicated decimal places
