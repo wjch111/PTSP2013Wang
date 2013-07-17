@@ -9,7 +9,7 @@ import framework.core.Game;
  * @author wj 
  * @date 2013/07/11
  */
-public class MOMCTSController extends Controller{
+public class MOMCTSController extends Controller{	
 
 	@Override
 	public int getAction(Game a_game, long a_timeDue) {

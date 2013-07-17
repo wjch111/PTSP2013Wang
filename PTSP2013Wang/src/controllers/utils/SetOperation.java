@@ -14,7 +14,6 @@ import java.util.Vector;
  * @date modified 2013/07/12
  */
 public class SetOperation {
-
 	public static <K,V> Vector<K> getKeys(Map<K,V> mp){
 		Vector<K> keys = new Vector<K>();
 		for(K k:mp.keySet()){
@@ -189,6 +188,12 @@ public class SetOperation {
 		if(v == null) return 0.0;
 		else return (java.lang.Double) v;
 	}
+	
+	public static <K,Double> int getIntValue(Map<K,Integer> map, K k){
+		Integer v = map.get(k);
+		if(v == null) return 0;
+		else return (java.lang.Integer) v;
+	}
 
 	//---------Vector arithmatic Operators-----------
 	/**
@@ -237,7 +242,33 @@ public class SetOperation {
 		return multiplication;
 	}
 	
+	public static Vector<Double> divs(Vector<Double> as, double b){
+		Vector<Double> multiplication = new Vector<Double>();
+		for(int i=0; i< as.size();i++){
+			multiplication.add(as.get(i)/b);
+		}
+		return multiplication;
+	}
+	
 	//---------end of Vector arithmatic Operators-----------
+	
+	//---------Map arithmatic Operators-----------
+	public static <T> HashMap<T, Double> muls(Map<T, Double> mp, double b){
+		HashMap<T, Double> mulMp = new HashMap<T, Double>();
+		for(T k : mulMp.keySet()){
+			mulMp.put(k, mp.get(k)*b);
+		}
+		return mulMp;
+	}
+
+	public static <T> HashMap<T, Double> divs(Map<T, Double> mp, double b){
+		HashMap<T, Double> divMp = new HashMap<T, Double>();
+		for(T k : mp.keySet()){
+			divMp.put(k, Presentation.ndigits(mp.get(k)/b,3));
+		}
+		return divMp;
+	}
+	//---------end of Map arithmatic Operators-----------
 	
 	//---------vector operations----------
 	public static <T> T pop(Vector<T> v, int elemInd){
@@ -279,6 +310,57 @@ public class SetOperation {
 			return false;
 		}
 	}
+	
+	public static <T> T randomElement(Vector<T> v){
+		if(v.size()>0){
+			return v.get(MathOperation.rndInt(v.size()));	
+		} else {
+			return null;
+		}
+	}
+	
+	public static <T> Vector<T> joinSeq(Vector<T> v1, Vector<T> v2){
+		@SuppressWarnings("unchecked")
+		Vector<T> vjoin = (Vector<T>) v1.clone();
+		vjoin.addAll(v2);
+		return vjoin;
+	}
+	
+	public static <T> Vector<T> joinSeq(T v, Vector<T> v2){
+		Vector<T> v1 = new Vector<T>();
+		v1.add(v);
+		return joinSeq(v1,v2);
+	}
+	
+	public static <T> Vector<T> joinSeq(Vector<T> v1, T v){
+		Vector<T> v2 = new Vector<T>();
+		v2.add(v);
+		return joinSeq(v1,v2);
+	}
+	
+	/**
+	 * Count the frequency of elements in a list
+	 * @param v
+	 * @return
+	 */
+	public static <T> HashMap<T, Integer> frequence(Vector<T> v){
+		HashMap<T, Integer> freq = new HashMap<T, Integer>();
+		for(T el : v){
+			if(freq.containsKey(el)) freq.put(el, freq.get(el)+1);
+			else freq.put(el, 1);
+		}
+		return freq;
+	}
+	
+	public static <T> HashMap<T, Double> frequencePortion(Vector<T> v){
+		HashMap<T, Double> freq = new HashMap<T, Double>();
+		for(T el : v){
+			if(freq.containsKey(el)) freq.put(el, freq.get(el)+1);
+			else freq.put(el, 1.0);
+		}
+		return divs(freq,v.size());
+	}
+	
 	//---------end of vector operations-----------
 
 	//---------matrix operations----------
@@ -392,8 +474,8 @@ public class SetOperation {
 		System.out.print("keys:"+sortItems(mp));
 		System.out.print(minItem(mp));
 	}
-	//---------end of Test Programs--------------
-	public static void main(String[] args){
+	
+	public void testMapEquivalence(){
 		SetOperation st = new SetOperation();
 		//st.testSort();
 		double[] as = {1.1,2.3,3.4};
@@ -408,6 +490,15 @@ public class SetOperation {
 		mp.put(av, true);
 		
 		System.out.println(mp.containsKey(bv));
+	}
+	//---------end of Test Programs--------------
+	
+	public static void main(String[] args){
+		int[] as = {1,2,2,3,3,4,1,1,2};
+		Vector<Integer> av = Transformation.intAry2Vec(as);
+		Presentation.showSeq(av);
+		System.out.println(frequence(av));
+		System.out.println(frequencePortion(av));
 
 	}
 	

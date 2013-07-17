@@ -1,6 +1,6 @@
 package controllers.utils;
 
-import java.text.NumberFormat;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -89,6 +89,10 @@ public class Presentation {
 		showMatrix(mx, defElemSep);
 	}
 	
+	public static <K,V> void showMap(Map<K,V> mp){
+		System.out.println(mp);
+	}
+	
 	
 	/**
 	 * Given a decimal number, show the decimal with accuracy to indicated decimal places
@@ -96,13 +100,12 @@ public class Presentation {
 	 * @param precision the number of decimals to show
 	 * @return
 	 */
-	public static String ndigits(double nb, int precision){
-		NumberFormat ddf1=NumberFormat.getNumberInstance() ;
-		ddf1.setMaximumFractionDigits(precision);
-		return ddf1.format(nb);
+	public static double ndigits(double nb, int precision){
+		double base = (int) Math.pow(10, precision);
+		return Math.round(nb*base)/base;
 	}
 	
-	public static String ndigits(double nb){
+	public static double ndigits(double nb){
 		return ndigits(nb,2);
 	}
 	

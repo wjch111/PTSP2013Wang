@@ -3,6 +3,10 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
+import controllers.utils.Archive;
+import controllers.utils.Debug;
+import controllers.utils.MOOTools;
+import controllers.utils.Presentation;
 import controllers.utils.SetOperation;
 
 /**
@@ -16,13 +20,37 @@ import controllers.utils.SetOperation;
  * @date	modified on 2013/07/16
  */
 public abstract class MOMCTS {
+	//-------------Meta reward prefix------------
+	protected static String RdomType = "dom";
+	public String getRdomType(){
+		return RdomType;
+	}
+	//-------------end of Meta reward prefix------------
+	
 	//-------------MOMCTS global variables---------------
-	private MOUCT root;
+	protected MOUCT root;
+	
+	protected Archive archive;
 
 	/**
 	 * Indicate the objectives to optimize in the MOMCTS planner
 	 */
-	private Vector<String> objectives;
+	protected Vector<String> objectives;
+	
+	/**
+	 * Defines the node selection criterion
+	 */
+	protected String metaRewardType;
+	
+	/**
+	 * Indicate the optimization direction in the planner
+	 */
+	protected boolean maximize;
+	
+	/**
+	 * A counter which records the number of simulations passed in the planner
+	 */
+	protected int smt;
 	
 	//-------------end of MOMCTS global variables---------------
 	
@@ -30,21 +58,84 @@ public abstract class MOMCTS {
 	/**
 	 * The constant to control the speed of progressive widening
 	 */
-	private double pwConst;
+	protected double pwConst;
 	
 	/**
 	 * The Exploration vs. Exploitation constants used in the UCB formula
 	 */
-	private HashMap<String,Double> EvEConsts;
+	protected HashMap<String,Double> EvEConsts;
 	
 	/**
 	 * The rave parameter used to adjust the balance between global rave and local rave
 	 */
-	private int raveLocal;
+	protected int raveLocal;
+	
+	/**
+	 * Define the speed of discounting in reward updates
+	 */
+	protected double defDiscount;
+	
 	//-------------end of MOMCTS parameters---------------------
 	
+	public MOMCTS(String metaRewardType, boolean maximize,
+			double pwConst, int raveLocal, double defDiscount) {
+		super();
+		this.root = new MOUCT(-1);
+		this.archive = new Archive();
+
+		this.metaRewardType = metaRewardType;
+		this.maximize = maximize;
+		this.pwConst = pwConst;
+		this.raveLocal = raveLocal;
+		this.defDiscount = defDiscount;
+		
+		this.EvEConsts = new HashMap<String,Double>();		
+		this.smt = 0;
+	}
+	
+	public void setObjectives(Vector<String> objs){
+		objectives = objs;
+		MOUCT.setDefRwdTypes(objs);
+	}
+	
+	public String getMetaRewardType() {
+		return metaRewardType;
+	}
+
+	public void setMetaRewardType(String metaRewardType) {
+		this.metaRewardType = metaRewardType;
+	}
+
+	public double getPwConst() {
+		return pwConst;
+	}
+
+	public void setPwConst(double pwConst) {
+		this.pwConst = pwConst;
+	}
+
+	public void setEvEConst(String rwdType, double c) {
+		EvEConsts.put(rwdType, c);
+	}
+
 	public double getEvEConst(String rwdType){
 		return SetOperation.getDoubleValue(EvEConsts, rwdType);
+	}
+	
+	public int getRaveLocal() {
+		return raveLocal;
+	}
+
+	public void setRaveLocal(int raveLocal) {
+		this.raveLocal = raveLocal;
+	}
+
+	public double getDefDiscount() {
+		return defDiscount;
+	}
+
+	public void setDefDiscount(double defDiscount) {
+		this.defDiscount = defDiscount;
 	}
 
 	public void setRoot(MOUCT rt){
@@ -59,8 +150,20 @@ public abstract class MOMCTS {
 		return objectives;
 	}
 
-	public void setObjectives(Vector<String> basicRwdTypes) {
-		this.objectives = basicRwdTypes;
+	public boolean isMaximize() {
+		return maximize;
+	}
+
+	public void setMaximize(boolean maximize) {
+		this.maximize = maximize;
+	}
+	
+	public int getSmt(){
+		return smt;
+	}
+	
+	public Archive getArchive() {
+		return archive;
 	}
 
 	protected double totalNb(Vector<MOUCT> sonNodes, String rwdType){
@@ -95,6 +198,10 @@ public abstract class MOMCTS {
 	
 	public MOUCT bestUCB(Vector<MOUCT> sonNodes, String rwdType){
 		return SetOperation.maxItem(sonNodes, UCBRanks(sonNodes, rwdType));
+	}
+	
+	public MOUCT bestUCB(MOUCT currNode, String rwdType){
+		return bestUCB(currNode.getSons(), rwdType);
 	}
 	
 	/**
@@ -138,6 +245,9 @@ public abstract class MOMCTS {
 	protected Vector<Double> RAVERanks(Vector<Integer> acts, String rwdType){
 		return RAVERanks(acts, rwdType, null);
 	}
+	
+	//protected Vector<Double> 
+	
 
 	/**
 	 * Given a parent node, return the candidate actions that are feasible in this node
@@ -152,35 +262,108 @@ public abstract class MOMCTS {
 	 * @return the rewards obtained by executing actSeq
 	 */
 	public abstract Vector<Double> evaluateSeq(Vector<Integer> actSeq);
+	
+	/**
+	 * @param leafNode	the node from which the random path starts
+	 * @return a random path which leads to the terminal state
+	 */
+	public abstract Vector<Integer> generateRandomPath(MOUCT leafNode);
 
+	protected void updateRAVEs(Vector<MOUCT> ns, 
+			Vector<Integer> rndActSeq, Vector<String> rwdTypes, Vector<Double> rs){
+		@SuppressWarnings("unchecked")
+		Vector<MOUCT> nodes = (Vector<MOUCT>) ns.clone();
+		while(nodes.size()>0){
+			MOUCT currN = SetOperation.popFront(nodes);
+			Vector<Integer> actS = SetOperation.joinSeq(MOUCT.extractActs(nodes), rndActSeq);
+			currN.updateRAVEs(actS,rwdTypes,rs, defDiscount);
+		}
+	}
+	
+	protected void updateRwds(Vector<MOUCT> nodes, Vector<String> objs, Vector<Double> objRwds){
+		MOUCT.updateRwds(nodes, objs, objRwds, smt, defDiscount);
+	}
+	
+	protected void updateArchive(Vector<Double> newPnt){
+		if(archive.addNewPoint(newPnt)) archive.rearrange(maximize);
+	}
+	
+	protected double updateDomReward(Vector<MOUCT> nodes, Vector<Double> newPnt, int age, String rwdType){
+		double domRwd = 0;
+		if(MOOTools.dominatesSet(newPnt,archive.getPoints(),maximize)){
+			domRwd = 1;
+		}
+		MOUCT.update(nodes, rwdType, domRwd, age, defDiscount);		
+		return domRwd;
+	}
+	
 	/**
 	 * Simulate one tree-walk in MOMCTS
 	 */
-	public void playOneSequence(boolean pwEnabled, String nbType){
+	public void playOneSequence(boolean pwEnabled, String nbType, boolean raveOn, boolean localRaveOn){
 		//The sequence of nodes visited during the tree walk
 		Vector<MOUCT> nodes = new Vector<MOUCT>();
 		nodes.add(root);
 		MOUCT currNd = nodes.lastElement();
 		
-		while(currNd.isRoot() || !currNd.isLeaf()){
+		while(true){
 			Vector<Integer> candAs = candidateActions(currNd);
+			if(candAs.size()==0) break;//when there is no more action to execute (terminal state reached), stop the path finding
 			
-			boolean newSonToAdd = false;
-			if(pwEnabled) {
-				int n1 = (int) Math.pow(currNd.getNb(nbType), pwConst);
-				int n2 = (int) Math.pow(currNd.getNb(nbType)+1, pwConst);
-				if(n2>n1 && currNd.getSons().size() < candAs.size()) newSonToAdd = true;
-			}
+			int n1 = (int) Math.pow(currNd.getNb(nbType), pwConst);
+			int n2 = (int) Math.pow(currNd.getNb(nbType)+1, pwConst);
 			
-			if(newSonToAdd){
+			if(n2>n1 && currNd.getSons().size() < candAs.size()) {
 				//Unexecuted actions
-				Vector<Integer> compActs = SetOperation.complementSet(candAs, currNd.sonActions());
-				//Vector<Double> raves = RAVERanks(compActs, );
+				Vector<Integer> unplayedActs = SetOperation.complementSet(candAs, currNd.sonActions());
+				int newAct = SetOperation.randomElement(unplayedActs);
 				
+				Vector<Double> actValues;
+				if(raveOn) {
+					if(localRaveOn) actValues = RAVERanks(unplayedActs, metaRewardType, currNd);
+					else actValues = RAVERanks(unplayedActs, metaRewardType, null);
+				} else {
+					actValues = new Vector<Double>(); 
+				}	
+				if(actValues.size() > 0) newAct = SetOperation.getBestItem(unplayedActs, actValues, maximize);
+				nodes.add(currNd.addSon(newAct));
+			} else {
+				nodes.add(bestUCB(currNd, metaRewardType));
 			}
-			
-			
+			currNd = nodes.lastElement();
 		}
+		
+		Vector<Integer> path = MOUCT.extractActs(nodes);
+		Vector<Integer> randomPath = generateRandomPath(currNd);
+
+		Vector<Integer> strtgy = SetOperation.joinSeq(path,randomPath);		
+		Vector<Double> objRwds = evaluateSeq(strtgy);
+		
+		updateRwds(nodes, objectives, objRwds);//basic rewards in each objective updated
+		updateRAVEs(nodes, randomPath, objectives, objRwds);
+
+		double r = 0;
+		if(metaRewardType.contains(RdomType)) {
+			r = updateDomReward(nodes, objRwds, smt, metaRewardType);
+			if(r!=0) Debug.debug(smt+" "+r);
+		}
+		//else if(strContains(metaRewardType, RrkType)) r = updateRankReward(nodes, newPnt, smt, metaRewardType);
+		//else if(strContains(metaRewardType, RhviType)) r = updateHviReward(nodes, newPnt, smt, metaRewardType);
+		//else if(strContains(metaRewardType, RprRkType)) r = updatePrRkReward(nodes, newPnt, smt, metaRewardType);
+		root.updateRAVE(randomPath, metaRewardType, r);
+		updateArchive(objRwds);
+		smt++;
 	}
 	
+	public void playOneSequence(boolean pwEnabled, String nbType){
+		playOneSequence(pwEnabled, nbType, false, false);
+	}
+	
+	public void playOneSequence(boolean pwEnabled){
+		playOneSequence(pwEnabled, objectives.firstElement());
+	}
+	
+	public void playOneSequence(){
+		playOneSequence(false);
+	}
 }

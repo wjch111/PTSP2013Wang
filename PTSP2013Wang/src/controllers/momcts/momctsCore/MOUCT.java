@@ -3,8 +3,8 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
-import controllers.utils.Debug;
 import controllers.utils.Presentation;
+import controllers.utils.SetOperation;
 
 
 /**
@@ -43,6 +43,11 @@ public class MOUCT {
 	 * The nbs map stores the total number of visits of each type
 	 */
 	private HashMap<String, Double> nbs;
+	
+	/**
+	 * Record the time when the reward was updated for the last time
+	 */
+	private HashMap<String, Integer> rwdAges;
 		
 	
 	/**
@@ -59,6 +64,7 @@ public class MOUCT {
 		sons = new Vector<MOUCT>();
 		context = new Vector<Integer>();
 		rwds = new HashMap<String,Double>();
+		rwdAges = new HashMap<String,Integer>();
 		nbs = new HashMap<String,Double>();
 	}
 
@@ -76,6 +82,10 @@ public class MOUCT {
 
 	public void setContext(Vector<Integer> context) {
 		this.context = context;
+	}
+	
+	public int getDepth(){
+		return context.size();
 	}
 
 	public int getAction() {
@@ -113,7 +123,19 @@ public class MOUCT {
 	protected void setNb(String rwdType, double n){
 		nbs.put(rwdType, n);
 	}
+
+	public static Vector<String> getDefRwdTypes() {
+		return defRwdTypes;
+	}
+
+	public static void setDefRwdTypes(Vector<String> defRwdTypes) {
+		MOUCT.defRwdTypes = defRwdTypes;
+	}
 	
+	public static void addDefRwdtypes(String rdTp){
+		defRwdTypes.add(rdTp);
+	}
+
 	/**
 	 * Increment the reward of type rwdType by r
 	 * @param rwdType
@@ -137,6 +159,13 @@ public class MOUCT {
 	
 	public void incrementRwd(String rwdType, double r){
 		incrementRwd(rwdType, r, 1.0);
+	}
+	
+	public double incrementRwd(String rwdType, double r, int age, double discount){
+		if(age < 0) return incrementRwd(rwdType, r, discount);
+		int ageDiff = age - SetOperation.getIntValue(rwdAges, rwdType);
+		rwdAges.put(rwdType, age);
+		return incrementRwd(rwdType, r, Math.pow(discount, ageDiff));
 	}
 
 	/**
@@ -251,7 +280,7 @@ public class MOUCT {
 	 * @param depth		pass the depth of the tree (used in presentation)
 	 */
 	public void showSelf(int limit, Vector<String> rwdTypes, String nbType, int depth){
-		if(rwdTypes.size()==0) rwdTypes = defRwdTypes;
+		if(rwdTypes.size()==0) rwdTypes = defRwdTypes;		
 		if(nbType == "") nbType = rwdTypes.firstElement();
 		
 		Presentation.multiOut(".|",depth);
@@ -261,13 +290,13 @@ public class MOUCT {
 			System.out.print(">");
 		}
 		System.out.print(action);
-		String n = Presentation.ndigits(this.getNb(nbType),1);
+		double n = Presentation.ndigits(this.getNb(nbType));
 		if(isLeaf()) System.out.print("->"+n);
 		else System.out.print("("+n+")");
 
 		for(int i=0; i<rwdTypes.size();i++){
 			String tp = rwdTypes.get(i);
-			String r = Presentation.ndigits(avgR(tp),4);
+			double r = Presentation.ndigits(avgR(tp),4);
 			System.out.print("\t"+tp+":"+r);
 		}
 
@@ -292,6 +321,12 @@ public class MOUCT {
 		showSelf(limit, rwdTypes, "");
 	}
 	
+	public void showSelf(int limit,String rwdType){
+		Vector<String> rwdTypes = new Vector<String>();
+		rwdTypes.add(rwdType);
+		showSelf(limit, rwdTypes, "");
+	}
+	
 	public void showSelf(int limit){
 		showSelf(limit,new Vector<String>());
 	}
@@ -303,8 +338,6 @@ public class MOUCT {
 		showSelf(-1);
 	}
 
-	
-
 	/**
 	 * Given a set of nodes and the reward obtained in one terminal state, update the rewards and number of visits of all nodes
 	 * @param nodePath	the list of nodes visited during one tree walk
@@ -313,22 +346,89 @@ public class MOUCT {
 	 * @param discount indicates the amount of discount that past rewards and nbs should take
 	 * @return the average rewards of all updated nodes
 	 */
-	public static Vector<Double> update(Vector<MOUCT> nodePath, String rwdType, double r, double discount){
+	public static Vector<Double> update(Vector<MOUCT> nodePath, String rwdType, double r, int age, double discount){
 		Vector<Double> avgRwds = new Vector<Double>();
 		for(MOUCT nd : nodePath){
-			avgRwds.add(nd.incrementRwd(rwdType, r, discount));
+			avgRwds.add(nd.incrementRwd(rwdType, r, age, discount));
 		}
 		return avgRwds;
 	}
 	
-	public static Vector<Double> update(Vector<MOUCT> nodePath, String rwdType, double r){
-		return update(nodePath, rwdType, r, 1.0);
+	public static Vector<Double> update(Vector<MOUCT> nodePath, String rwdType, double r, int age){
+		return update(nodePath, rwdType, r, age, 1.0);
 	}
 	
-	public static Vector<Integer> getActSeq(Vector<MOUCT> nodes){
+	public static Vector<Double> update(Vector<MOUCT> nodePath, String rwdType, double r){
+		return update(nodePath, rwdType, r, -1);
+	}
+	
+	/**
+	 * Update the rewards of types indicated in rTypes in all nodes in nodePath
+	 * @param nodePath
+	 * @param rTypes
+	 * @param rs
+	 * @return the average vectorial rewards in each node (the size of returned points are equal to the size of nodePath)
+	 */
+	public static Vector<Vector<Double>> updateRwds(Vector<MOUCT> nodePath, 
+			Vector<String> rTypes, Vector<Double> rs, int age, double discount){
+		Vector<Vector<Double>> updatedAvgs = new Vector<Vector<Double>>();
+		for(int i=0; i<rTypes.size(); i++){
+			String rtp = rTypes.get(i);
+			double r = rs.get(i);
+			updatedAvgs.add(update(nodePath, rtp, r, age, discount));
+		}
+		
+		return SetOperation.transposeMatrix(updatedAvgs);
+	}
+	
+	public static Vector<Vector<Double>> updateRwds(Vector<MOUCT> nodePath, 
+			Vector<String> rTypes, Vector<Double> rs, int age){
+		return updateRwds(nodePath, rTypes, rs, age, 1.0);
+	}
+	
+	public static Vector<Vector<Double>> updateRwds(Vector<MOUCT> nodePath, 
+			Vector<String> rTypes, Vector<Double> rs){
+		return updateRwds(nodePath, rTypes, rs, -1);
+	}
+	
+	public void updateRAVE(Vector<Integer> acts, String rwdType, double r, double discount){
+		for(int a : acts){
+			incrementRAVE(a, rwdType, r, discount);
+		}
+	}
+	
+	public void updateRAVE(Vector<Integer> acts, String rwdType, double r){
+		updateRAVE(acts, rwdType, r, 1.0);
+	}
+	
+	public void updateRAVEs(Vector<Integer> acts, Vector<String> rwdTypes, Vector<Double> rs, double discount){
+		for(int i=0;i<rwdTypes.size();i++){
+			String rwdType = rwdTypes.get(i);
+			double r = rs.get(i);
+			updateRAVE(acts, rwdType, r, discount);
+		}
+	}
+	
+	public void updateRAVEs(Vector<Integer> acts, Vector<String> rwdTypes, Vector<Double> rs){
+		updateRAVEs(acts, rwdTypes, rs, 1.0);
+	}
+	
+	public static void updateRAVEs(Vector<MOUCT> nodes, 
+			Vector<Integer> acts, Vector<String> rwdTypes, Vector<Double> rs, double discount){
+		for(MOUCT n:nodes){
+			n.updateRAVEs(acts, rwdTypes, rs, discount);
+		}
+	}
+	
+	public static void updateRAVEs(Vector<MOUCT> nodes, 
+			Vector<Integer> acts, Vector<String> rwdTypes, Vector<Double> rs){
+		updateRAVEs(nodes, acts, rwdTypes, rs, 1.0);
+	}
+	
+	public static Vector<Integer> extractActs(Vector<MOUCT> nodes){
 		Vector<Integer> acts = new Vector<Integer>();
-		for(int i=0; i<nodes.size();i++){
-			acts.add(nodes.get(i).getAction());
+		for(MOUCT n: nodes){
+			acts.add(n.getAction());
 		}
 		return acts;
 	}
@@ -350,7 +450,7 @@ public class MOUCT {
 					oneRun.add(s);
 					oneRun.add(ss);
 					if(k%2 == j%2) oneRun.add(ss.addSon(k));
-					update(oneRun, defRwdTypes.firstElement(), 0.5, 0.9);
+					update(oneRun, defRwdTypes.firstElement(), 0.5, 3, 0.9);
 				}
 			}
 		}

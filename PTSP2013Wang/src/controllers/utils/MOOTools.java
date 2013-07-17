@@ -189,9 +189,9 @@ public class MOOTools {
 	 * Fast Non-Dominated Sort algorithm by K. Deb, 2000
 	 * @param points
 	 * @param maximize
-	 * @return
+	 * @return	and index of points in different Pareto rank layers
 	 */
-	public static Vector<Vector<Integer>> orderPoints(Vector<Vector<Double>> points, boolean maximize){
+	public static Vector<Vector<Integer>> fastNonDominatedSort(Vector<Vector<Double>> points, boolean maximize){
 		Vector<Vector<Integer>> Sp = new Vector<Vector<Integer>>();//Sp[i] store the index of points who are dominated by points[i]
 		Vector<Integer> np = new Vector<Integer>();//np[i] stores the number of points who are dominated by points[i]
 		for(int i=0;i<points.size();i++){
@@ -240,7 +240,7 @@ public class MOOTools {
 	}
 	
 	public static Vector<Integer> nonDominatedInds(Vector<Vector<Double>> pnts, boolean maximize){
-		return 	orderPoints(pnts,maximize).firstElement();
+		return 	fastNonDominatedSort(pnts,maximize).firstElement();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -384,7 +384,7 @@ public class MOOTools {
 		Presentation.showMatrix(bs);
 		System.out.println(hypervolumeIndicator(bs));
 		System.out.println(HVIContrib(av, bs));
-		System.out.println(this.orderPoints(bs, true));
+		System.out.println(this.fastNonDominatedSort(bs, true));
 		
 		
 	}
