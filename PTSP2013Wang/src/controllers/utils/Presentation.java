@@ -100,6 +100,7 @@ public class Presentation {
 	 * @param precision the number of decimals to show
 	 * @return
 	 */
+	//TODO to correct the not sishewuru pb
 	public static double ndigits(double nb, int precision){
 		double base = (int) Math.pow(10, precision);
 		double mul = nb*base;

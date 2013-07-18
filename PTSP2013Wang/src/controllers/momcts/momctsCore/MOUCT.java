@@ -115,7 +115,7 @@ public class MOUCT {
 	}
 	
 	public double getRwd(String rwdType){
-		return getRwd(rwdType, -1);
+		return getRwd(rwdType, 4);
 	}
 	
 	public double getNb(String rwdType){
@@ -151,9 +151,9 @@ public class MOUCT {
 	 * @param discount	if specified, then the original reward will be discounted by factor discount
 	 */
 	public double incrementRwd(String rwdType, double r, double discount){
-		//Debug.debug(rwdType+" "+r+" "+" "+discount);
 		Double orgR = this.getRwd(rwdType);
 		Double orgN = this.getNb(rwdType);
+		if(rwdType.contains("Dom")) Debug.debug(orgR+" "+orgN);
 		if(orgR == null) {
 			orgR = 0.;
 			orgN = 0.;
@@ -194,7 +194,7 @@ public class MOUCT {
 	}
 	
 	public double avgR(String type){
-		return avgR(type, -1);
+		return avgR(type, 4);
 	}
 
 	
