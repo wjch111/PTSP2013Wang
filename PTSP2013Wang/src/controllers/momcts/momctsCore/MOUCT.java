@@ -115,7 +115,27 @@ public class MOUCT {
 	}
 	
 	public double getRwd(String rwdType){
-		return getRwd(rwdType, 4);
+		return getRwd(rwdType, -1);
+	}
+	
+	/**
+	 * Return the average reward of type type
+	 * @param type	indicate the type of the reward required
+	 * @return the average reward
+	 */
+	public double avgR(String type, int precision){
+		Double r = getRwd(type);
+		Double n = getNb(type);
+		if(r == null) return 0;
+		if(n !=0 ) {
+			if(precision > 0) return Presentation.ndigits(r/n,precision);
+			else return r/n;
+		}
+		else return 0;
+	}
+	
+	public double avgR(String type){
+		return avgR(type, -1);
 	}
 	
 	public double getNb(String rwdType){
@@ -175,26 +195,6 @@ public class MOUCT {
 		int ageDiff = age - SetOperation.getIntValue(rwdAges, rwdType);
 		rwdAges.put(rwdType, age);
 		return incrementRwd(rwdType, r, Math.pow(discount, ageDiff));
-	}
-
-	/**
-	 * Return the average reward of type type
-	 * @param type	indicate the type of the reward required
-	 * @return the average reward
-	 */
-	public double avgR(String type, int precision){
-		Double r = getRwd(type);
-		Double n = getNb(type);
-		if(r == null) return 0;
-		if(n !=0 ) {
-			if(precision > 0) return Presentation.ndigits(r/n,precision);
-			else return r/n;
-		}
-		else return 0;
-	}
-	
-	public double avgR(String type){
-		return avgR(type, 4);
 	}
 
 	
