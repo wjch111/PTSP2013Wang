@@ -102,7 +102,9 @@ public class Presentation {
 	 */
 	public static double ndigits(double nb, int precision){
 		double base = (int) Math.pow(10, precision);
-		return Math.round(nb*base)/base;
+		double mul = nb*base;
+		if(mul < 1.0) return 0;
+		else return Math.round(mul)/base;
 	}
 	
 	public static double ndigits(double nb){
@@ -110,9 +112,8 @@ public class Presentation {
 	}
 	
 	public static void main(String[] args){
-		double[] is = {1,2,3,4,5};
-		Vector<Double> ints = Transformation.doubleAry2Vec(is);
-		showSeqln(ints);
+		double a = 4.423782231483507E-9;
+		System.out.println(ndigits(a,3));
 	}
 	
 }

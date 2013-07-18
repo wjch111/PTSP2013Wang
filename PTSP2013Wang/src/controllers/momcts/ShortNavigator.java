@@ -14,6 +14,12 @@ import controllers.momcts.momctsCore.MOUCT;
  */
 public class ShortNavigator extends MOMCTS{
 
+	public ShortNavigator(String metaRewardType, boolean maximize,
+			double pwConst, int raveLocal, double defDiscount) {
+		super(metaRewardType, maximize, pwConst, raveLocal, defDiscount);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Vector<Integer> candidateActions(MOUCT parentNode) {
 		// TODO Auto-generated method stub

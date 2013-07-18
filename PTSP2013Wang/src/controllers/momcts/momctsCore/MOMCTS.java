@@ -21,7 +21,7 @@ import controllers.utils.SetOperation;
  */
 public abstract class MOMCTS {
 	//-------------Meta reward prefix------------
-	protected static String RdomType = "dom";
+	protected static String RdomType = "Dom";
 	public String getRdomType(){
 		return RdomType;
 	}
@@ -75,7 +75,17 @@ public abstract class MOMCTS {
 	 */
 	protected double defDiscount;
 	
+	/**
+	 * Limit the number of solutions associated with each vectorial reward
+	 */
+	protected int solNbLimitPerPoint;
+	
 	//-------------end of MOMCTS parameters---------------------
+	
+	
+	//-------------Debug paramaters---------------
+	protected Debug debugger = new Debug();
+	//-------------end of debug parameters--------
 	
 	public MOMCTS(String metaRewardType, boolean maximize,
 			double pwConst, int raveLocal, double defDiscount) {
@@ -91,6 +101,9 @@ public abstract class MOMCTS {
 		
 		this.EvEConsts = new HashMap<String,Double>();		
 		this.smt = 0;
+		this.solNbLimitPerPoint = -1;
+		
+		debugger.counter=0;
 	}
 	
 	public void setObjectives(Vector<String> objs){
@@ -138,6 +151,15 @@ public abstract class MOMCTS {
 		this.defDiscount = defDiscount;
 	}
 
+	public int getSolNbLimitPerPoint(){
+		return solNbLimitPerPoint;
+	}
+
+	public void setSolNbLimitPerPoint(int solNbLimitPerPoint) {
+		this.solNbLimitPerPoint = solNbLimitPerPoint;
+		archive.setSolNbLimit(solNbLimitPerPoint);
+	}
+
 	public void setRoot(MOUCT rt){
 		root = rt;
 	}
@@ -182,26 +204,36 @@ public abstract class MOMCTS {
 		return rs;
 	}
 	
-	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType, double eveConst){
+	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType, double eveConst, boolean avg){
 		Vector<Double> rks = new Vector<Double>();
 		double totNb= totalNb(sonNodes, rwdType);
 		for(MOUCT s: sonNodes){
-			double rk = s.avgR(rwdType)+ eveConst*Math.sqrt(Math.log10(totNb)/s.getNb(rwdType));
+			double r = s.avgR(rwdType);
+			if(!avg) r = s.getRwd(rwdType);
+			double rk = r + eveConst*Math.sqrt(Math.log10(totNb)/s.getNb(rwdType));
 			rks.add(rk);
 		}
 		return rks;	
+	}
+	
+	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType, double eveConst){
+		return UCBRanks(sonNodes, rwdType, eveConst, true);
 	}
 	
 	protected Vector<Double> UCBRanks(Vector<MOUCT> sonNodes, String rwdType){
 		return UCBRanks(sonNodes, rwdType, getEvEConst(rwdType));
 	}
 	
-	public MOUCT bestUCB(Vector<MOUCT> sonNodes, String rwdType){
-		return SetOperation.maxItem(sonNodes, UCBRanks(sonNodes, rwdType));
+	public MOUCT bestUCB(Vector<MOUCT> sonNodes, String rwdType, boolean avg){
+		return SetOperation.maxItem(sonNodes, UCBRanks(sonNodes, rwdType, getEvEConst(rwdType), avg));
+	}
+	
+	public MOUCT bestUCB(MOUCT currNode, String rwdType, boolean avg){
+		return bestUCB(currNode.getSons(), rwdType, avg);
 	}
 	
 	public MOUCT bestUCB(MOUCT currNode, String rwdType){
-		return bestUCB(currNode.getSons(), rwdType);
+		return bestUCB(currNode, rwdType, true);
 	}
 	
 	/**
@@ -270,50 +302,72 @@ public abstract class MOMCTS {
 	public abstract Vector<Integer> generateRandomPath(MOUCT leafNode);
 
 	protected void updateRAVEs(Vector<MOUCT> ns, 
-			Vector<Integer> rndActSeq, Vector<String> rwdTypes, Vector<Double> rs){
+			Vector<Integer> rndActSeq, Vector<String> rwdTypes, Vector<Double> rs, double discount){
 		@SuppressWarnings("unchecked")
 		Vector<MOUCT> nodes = (Vector<MOUCT>) ns.clone();
 		while(nodes.size()>0){
 			MOUCT currN = SetOperation.popFront(nodes);
 			Vector<Integer> actS = SetOperation.joinSeq(MOUCT.extractActs(nodes), rndActSeq);
-			currN.updateRAVEs(actS,rwdTypes,rs, defDiscount);
+			currN.updateRAVEs(actS,rwdTypes,rs, discount);
 		}
 	}
 	
-	protected void updateRwds(Vector<MOUCT> nodes, Vector<String> objs, Vector<Double> objRwds){
-		MOUCT.updateRwds(nodes, objs, objRwds, smt, defDiscount);
+	protected void updateRAVEs(Vector<MOUCT> ns, 
+			Vector<Integer> rndActSeq, Vector<String> rwdTypes, Vector<Double> rs){
+		updateRAVEs(ns, rndActSeq, rwdTypes, rs, 1.0);
+	}
+	
+	protected void updateRwds(Vector<MOUCT> nodes, Vector<String> objs, Vector<Double> objRwds, int age, double discount){
+		MOUCT.updateRwds(nodes, objs, objRwds, age, discount);
+	}
+	
+	protected void updateRwds(Vector<MOUCT> nodes, Vector<String> objs, Vector<Double> objRwds, int age){
+		updateRwds(nodes, objs, objRwds, age, 1.0);
+	}
+	
+	protected void updateArchive(Vector<Double> newPnt, Vector<Integer> sol){
+		if(archive.addNewPoint(newPnt, sol)) archive.rearrange(maximize);
 	}
 	
 	protected void updateArchive(Vector<Double> newPnt){
 		if(archive.addNewPoint(newPnt)) archive.rearrange(maximize);
 	}
 	
+	public Vector<Vector<Integer>> getOptimalSolutions(){
+		return archive.getSolutions();
+	}
+	
+	@SuppressWarnings("static-access")
 	protected double updateDomReward(Vector<MOUCT> nodes, Vector<Double> newPnt, int age, String rwdType){
 		double domRwd = 0;
-		if(MOOTools.dominatesSet(newPnt,archive.getPoints(),maximize)){
-			domRwd = 1;
-		}
+		if(MOOTools.dominatesSet(newPnt,archive.getPoints(),maximize)) domRwd = 1;
 		MOUCT.update(nodes, rwdType, domRwd, age, defDiscount);		
+		if(domRwd > 0) {
+			System.out.println(domRwd);
+			debugger.debug(smt+" "+root.getRwd(rwdType));
+		}
 		return domRwd;
 	}
 	
 	/**
 	 * Simulate one tree-walk in MOMCTS
+	 * @return the nodes visited in this tree walk
 	 */
-	public void playOneSequence(boolean pwEnabled, String nbType, boolean raveOn, boolean localRaveOn){
+	public Vector<MOUCT> playOneSequence(boolean pwEnabled, String nbType, boolean raveOn, boolean localRaveOn){
 		//The sequence of nodes visited during the tree walk
 		Vector<MOUCT> nodes = new Vector<MOUCT>();
 		nodes.add(root);
 		MOUCT currNd = nodes.lastElement();
 		
-		while(true){
+		while(currNd.isRoot() || currNd.getNb(nbType)>0){
 			Vector<Integer> candAs = candidateActions(currNd);
 			if(candAs.size()==0) break;//when there is no more action to execute (terminal state reached), stop the path finding
 			
-			int n1 = (int) Math.pow(currNd.getNb(nbType), pwConst);
-			int n2 = (int) Math.pow(currNd.getNb(nbType)+1, pwConst);
+			int nb = (int) currNd.getNb(nbType);
+			int n1 = (int) Math.pow(nb-1, pwConst);
+			int n2 = (int) Math.pow(nb, pwConst);
 			
-			if(n2>n1 && currNd.getSons().size() < candAs.size()) {
+			if(nb == 0 || (n2>n1 && currNd.getSons().size() < candAs.size()) ) {
 				//Unexecuted actions
 				Vector<Integer> unplayedActs = SetOperation.complementSet(candAs, currNd.sonActions());
 				int newAct = SetOperation.randomElement(unplayedActs);
@@ -328,7 +382,8 @@ public abstract class MOMCTS {
 				if(actValues.size() > 0) newAct = SetOperation.getBestItem(unplayedActs, actValues, maximize);
 				nodes.add(currNd.addSon(newAct));
 			} else {
-				nodes.add(bestUCB(currNd, metaRewardType));
+				if(metaRewardType.contains(RdomType)) nodes.add(bestUCB(currNd, metaRewardType, false));
+				else nodes.add(bestUCB(currNd, metaRewardType, true));
 			}
 			currNd = nodes.lastElement();
 		}
@@ -339,31 +394,35 @@ public abstract class MOMCTS {
 		Vector<Integer> strtgy = SetOperation.joinSeq(path,randomPath);		
 		Vector<Double> objRwds = evaluateSeq(strtgy);
 		
-		updateRwds(nodes, objectives, objRwds);//basic rewards in each objective updated
+		updateRwds(nodes, objectives, objRwds, smt);//basic rewards in each objective updated
 		updateRAVEs(nodes, randomPath, objectives, objRwds);
 
 		double r = 0;
 		if(metaRewardType.contains(RdomType)) {
 			r = updateDomReward(nodes, objRwds, smt, metaRewardType);
-			if(r!=0) Debug.debug(smt+" "+r);
+			if(r!=0) {
+				debugger.counter += r;
+				debugger.debug(smt+" "+debugger.counter);
+			}
 		}
 		//else if(strContains(metaRewardType, RrkType)) r = updateRankReward(nodes, newPnt, smt, metaRewardType);
 		//else if(strContains(metaRewardType, RhviType)) r = updateHviReward(nodes, newPnt, smt, metaRewardType);
 		//else if(strContains(metaRewardType, RprRkType)) r = updatePrRkReward(nodes, newPnt, smt, metaRewardType);
 		root.updateRAVE(randomPath, metaRewardType, r);
-		updateArchive(objRwds);
+		updateArchive(objRwds, strtgy);
 		smt++;
+		return nodes;
 	}
 	
-	public void playOneSequence(boolean pwEnabled, String nbType){
-		playOneSequence(pwEnabled, nbType, false, false);
+	public Vector<MOUCT> playOneSequence(boolean pwEnabled, String nbType){
+		return playOneSequence(pwEnabled, nbType, false, false);
 	}
 	
-	public void playOneSequence(boolean pwEnabled){
-		playOneSequence(pwEnabled, objectives.firstElement());
+	public Vector<MOUCT> playOneSequence(boolean pwEnabled){
+		return playOneSequence(pwEnabled, objectives.firstElement());
 	}
 	
-	public void playOneSequence(){
-		playOneSequence(false);
+	public Vector<MOUCT> playOneSequence(){
+		return playOneSequence(false);
 	}
 }

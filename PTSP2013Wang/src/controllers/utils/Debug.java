@@ -3,6 +3,8 @@ package controllers.utils;
 import java.util.Vector;
 
 public class Debug {
+	public int counter;
+	
 	public static void debug(){
 		System.out.println("=OK=");		
 	}
@@ -17,5 +19,9 @@ public class Debug {
 	
 	public static void showSeq(Vector<Integer> is){
 		Presentation.showSeq(is);
+	}
+	
+	public void showCounter(){
+		System.out.println(counter);
 	}
 }

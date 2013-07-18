@@ -123,9 +123,7 @@ public class MOOTools {
 	public static boolean isDominatedByAllSet(Vector<Double> p, Vector<Vector<Double>> pnts){
 		return isDominatedByAllSet(p, pnts, true);
 	}
-	
-	//TODO
-	//pnts = nonDominatedPoints(pnts, maxD1);
+
 	public static Vector<Vector<Double>> eliminateRepetitions(Vector<Vector<Double>> pnts){
 		Map<Vector<Double>, Boolean> mp = new HashMap<Vector<Double>, Boolean>();
 		for(Vector<Double> p:pnts){
@@ -365,6 +363,11 @@ public class MOOTools {
 		return HVIContrib(pnt, nonDomPnts, true);
 	}
 	
+	public static void showPoints(Vector<Vector<Double>> pnts){
+		Presentation.showMatrix(pnts);
+	}
+	
+	
 	//-----------test programs-------------
 	public void testHVI(){
 		double[] as = {3,3,3};
@@ -385,8 +388,6 @@ public class MOOTools {
 		System.out.println(hypervolumeIndicator(bs));
 		System.out.println(HVIContrib(av, bs));
 		System.out.println(this.fastNonDominatedSort(bs, true));
-		
-		
 	}
 	
 	//-----------end of test programs----------

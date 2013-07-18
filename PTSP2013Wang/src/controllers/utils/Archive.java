@@ -1,5 +1,6 @@
 package controllers.utils;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -11,13 +12,53 @@ import java.util.Vector;
  */
 public class Archive {
 	private Vector<Vector<Double>> points;
+	private int solNbLimit;
+	/**
+	 * Record the solutions leading to the given point
+	 */
+	private HashMap<Vector<Double>,Vector<Vector<Integer>>> pnt2sols;
 	
 	public Archive(){
 		points = new Vector<Vector<Double>>();
-	}
+		pnt2sols = new HashMap<Vector<Double>,Vector<Vector<Integer>>>();
+		solNbLimit = -1;
+	}	
+
+	public Archive(int sLimit){
+		points = new Vector<Vector<Double>>();
+		pnt2sols = new HashMap<Vector<Double>,Vector<Vector<Integer>>>();
+		solNbLimit = sLimit;
+	}	
 	
+	public int getSolNbLimit() {
+		return solNbLimit;
+	}
+
+	public void setSolNbLimit(int solNbLimit) {
+		this.solNbLimit = solNbLimit;
+	}
+
 	public Vector<Vector<Double>> getPoints(){
 		return points;
+	}
+	
+	public void setSols(Vector<Double> pnt, Vector<Vector<Integer>> sols){
+		pnt2sols.put(pnt, sols);
+	}
+	
+	public void addSol(Vector<Double> pnt, Vector<Integer> sol){
+		if(pnt2sols.containsKey(pnt)){
+			pnt2sols.put(pnt, SetOperation.joinSeq(pnt2sols.get(pnt), sol, solNbLimit));
+		} else {
+			Vector<Vector<Integer>> sols = new Vector<Vector<Integer>>();
+			sols.add(sol);
+			pnt2sols.put(pnt, sols);
+		}
+	}
+	
+	public Vector<Vector<Integer>> getSols(Vector<Double> pnt){
+		if(pnt2sols.containsKey(pnt)) return pnt2sols.get(pnt);
+		else return new Vector<Vector<Integer>>();
 	}
 	
 	/**
@@ -31,6 +72,20 @@ public class Archive {
 			points.add(pnt);
 			return true;
 		}
+	}
+	
+	public boolean addNewPoint(Vector<Double> pnt, Vector<Integer> sol){
+		if(addNewPoint(pnt)) {
+			addSol(pnt, sol);
+			return true;
+		} else if(points.contains(pnt)){
+			if(getSols(pnt).contains(sol)) return false;
+			else {
+				addSol(pnt,sol);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public boolean contains(Vector<Double> pnt){
@@ -47,6 +102,55 @@ public class Archive {
 	public Vector<Vector<Double>> rearrange(boolean maximize){
 		points = MOOTools.nonDominatedPnts(points, maximize);
 		return points;
+	}
+	
+	public Vector<Vector<Integer>> getSolutions(){
+		Vector<Vector<Integer>> allSols = new Vector<Vector<Integer>>();
+		for(Vector<Double> p : points){
+			allSols.addAll(pnt2sols.get(p));
+		}
+		return allSols;
+	}
+	
+	public void showPntSol(){
+		for(Vector<Double> p:points){
+			Presentation.showSeq(p);System.out.print("\t");Presentation.showSeqln(getSols(p).firstElement());
+		}
+	}
+	
+	public void showPntSols(){
+		for(Vector<Double> p:points){
+			Presentation.showSeqln(p);
+			for(Vector<Integer> sol:getSols(p)){
+				Presentation.showSeqln(sol);
+			}
+			Presentation.spr();
+		}
+	}
+	
+	public void showPoints(){
+		Presentation.showMatrix(points);
+	}
+	
+	public static void testPnt2Sol(){
+		double[] p1 = {1.1,2.005,3.4};
+		double[] p2 = {1.1,2.005,3.4001};
+		
+		int[] s1 = {1,2,3,3,4,4,4};
+		int[] s2 = {2,3,3,3,5,1};
+		
+		Transformation ts = new Transformation();
+		Archive ar = new Archive();
+		ar.addNewPoint(ts.doubleAry2Vec(p1), ts.intAry2Vec(s1));
+		ar.addNewPoint(ts.doubleAry2Vec(p2), ts.intAry2Vec(s2));
+		
+		Presentation.showMatrix(ar.getSols(ts.doubleAry2Vec(p1)));
+		Presentation.spr();
+		Presentation.showMatrix(ar.getSols(ts.doubleAry2Vec(p2)));
+	}
+	
+	public static void main(String[] args){
+		testPnt2Sol();
 	}
 	
 }

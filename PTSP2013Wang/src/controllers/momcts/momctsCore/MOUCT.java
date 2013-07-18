@@ -3,6 +3,7 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
+import controllers.utils.Debug;
 import controllers.utils.Presentation;
 import controllers.utils.SetOperation;
 
@@ -104,10 +105,17 @@ public class MOUCT {
 		return nbs;
 	}
 	
-	public double getRwd(String rwdType){
+	public double getRwd(String rwdType, int precision){
 		Double r = rwds.get(rwdType); 
 		if(r == null) return 0;
-		else return r;
+		else {
+			if(precision > 0) return Presentation.ndigits(r,precision);
+			else return r;
+		}
+	}
+	
+	public double getRwd(String rwdType){
+		return getRwd(rwdType, -1);
 	}
 	
 	public double getNb(String rwdType){
@@ -143,6 +151,7 @@ public class MOUCT {
 	 * @param discount	if specified, then the original reward will be discounted by factor discount
 	 */
 	public double incrementRwd(String rwdType, double r, double discount){
+		//Debug.debug(rwdType+" "+r+" "+" "+discount);
 		Double orgR = this.getRwd(rwdType);
 		Double orgN = this.getNb(rwdType);
 		if(orgR == null) {
@@ -173,12 +182,19 @@ public class MOUCT {
 	 * @param type	indicate the type of the reward required
 	 * @return the average reward
 	 */
-	public double avgR(String type){
+	public double avgR(String type, int precision){
 		Double r = getRwd(type);
 		Double n = getNb(type);
 		if(r == null) return 0;
-		if(n !=0 ) return r/n;
+		if(n !=0 ) {
+			if(precision > 0) return Presentation.ndigits(r/n,precision);
+			else return r/n;
+		}
 		else return 0;
+	}
+	
+	public double avgR(String type){
+		return avgR(type, -1);
 	}
 
 	
@@ -278,10 +294,11 @@ public class MOUCT {
 	 * @param rwdTypes	indicate the reward types to be shown
 	 * @param nbType	indicate the number of visits recored in one nbs key
 	 * @param depth		pass the depth of the tree (used in presentation)
+	 * @param avg		indicate whether the average reward or the total reward is to be displayed
 	 */
-	public void showSelf(int limit, Vector<String> rwdTypes, String nbType, int depth){
+	public void showSelf(int limit, Vector<String> rwdTypes, boolean avg, String nbType, int depth){
 		if(rwdTypes.size()==0) rwdTypes = defRwdTypes;		
-		if(nbType == "") nbType = rwdTypes.firstElement();
+		if(nbType == "") nbType = MOUCT.defRwdTypes.firstElement();//rwdTypes.firstElement();
 		
 		Presentation.multiOut(".|",depth);
 		if(context.size()>0 && depth == 0){
@@ -296,14 +313,15 @@ public class MOUCT {
 
 		for(int i=0; i<rwdTypes.size();i++){
 			String tp = rwdTypes.get(i);
-			double r = Presentation.ndigits(avgR(tp),4);
+			double r = avgR(tp, 4);
+			if(!avg) r = getRwd(tp, 4); 
 			System.out.print("\t"+tp+":"+r);
 		}
 
 		if(limit != 0){
 			System.out.println();
 			for(int i=0; i<sons.size();i++){
-				sons.get(i).showSelf(limit-1, rwdTypes, nbType, depth+1);
+				sons.get(i).showSelf(limit-1, rwdTypes, avg, nbType, depth+1);
 			}
 		} else {
 			if( sons.size()>0){
@@ -313,18 +331,22 @@ public class MOUCT {
 		}
 	}
 	
-	public void showSelf(int limit, Vector<String> rwdTypes, String nbType){
-		showSelf(limit, rwdTypes, nbType, 0);
+	public void showSelf(int limit, Vector<String> rwdTypes, boolean avg, String nbType){
+		showSelf(limit, rwdTypes, avg, nbType, 0);
 	}
 
+	public void showSelf(int limit, Vector<String> rwdTypes, boolean avg){
+		showSelf(limit, rwdTypes, avg, "");
+	}
+	
 	public void showSelf(int limit, Vector<String> rwdTypes){
-		showSelf(limit, rwdTypes, "");
+		showSelf(limit, rwdTypes, true);
 	}
 	
 	public void showSelf(int limit,String rwdType){
 		Vector<String> rwdTypes = new Vector<String>();
 		rwdTypes.add(rwdType);
-		showSelf(limit, rwdTypes, "");
+		showSelf(limit, rwdTypes);
 	}
 	
 	public void showSelf(int limit){

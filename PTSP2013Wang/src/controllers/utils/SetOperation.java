@@ -49,6 +49,21 @@ public class SetOperation {
 		return elems;
 	}
 	
+	public static <T> Vector<T> eliminateElements(Vector<T> v, Vector<Integer> inds){
+		Vector<T> elems = getElements(v,inds);
+		v.removeAll(elems);
+		return elems;
+	}
+	
+	public static <T> Vector<T> eliminateFirstNElements(Vector<T> v, int n){
+		return eliminateElements(v, arithmeticProgression(n));
+	}
+	
+	public static <T> Vector<T> eliminateLastNElements(Vector<T> v, int n){
+		if(n>v.size()) n= v.size();
+		return eliminateElements(v, arithmeticProgression(n,v.size()-n));
+	}
+	
 	/**
 	 * An example class to define equals() method
 	 * @author wj
@@ -109,7 +124,7 @@ public class SetOperation {
 		
 
 		@Override
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public int compare(Object arg0, Object arg1) {
 			Comparable v0 = (Comparable) map.get(arg0);
 			Comparable v1 = (Comparable) map.get(arg1);
@@ -183,12 +198,14 @@ public class SetOperation {
 	 * @param k
 	 * @return
 	 */
+	@SuppressWarnings("hiding")
 	public static <K,Double> double getDoubleValue(Map<K,Double> map, K k){
 		Double v = map.get(k);
 		if(v == null) return 0.0;
 		else return (java.lang.Double) v;
 	}
 	
+	@SuppressWarnings("hiding")
 	public static <K,Double> int getIntValue(Map<K,Integer> map, K k){
 		Integer v = map.get(k);
 		if(v == null) return 0;
@@ -326,16 +343,51 @@ public class SetOperation {
 		return vjoin;
 	}
 	
+	/**
+	 * Join two sequences and limit their total length under maxseq, if surpassed, cut the head of the joint sequence
+	 * @param s
+	 * @param segment
+	 * @param maxseq
+	 * @return
+	 */
+	public static <T> Vector<T> joinSeq(Vector<T> s, Vector<T> segment, int maxseq){
+		@SuppressWarnings("unchecked")
+		Vector<T> seqOrg = (Vector<T>) s.clone();
+		int size = segment.size();
+
+		if(maxseq < 0 || seqOrg.size()+ size < maxseq){
+			seqOrg = joinSeq(seqOrg, segment);
+		} else {
+			int offset = Math.min(size+seqOrg.size()-maxseq,size);
+			eliminateFirstNElements(seqOrg, offset);
+			seqOrg = joinSeq(seqOrg, segment);
+		}
+		
+		return seqOrg;
+	}
+	
 	public static <T> Vector<T> joinSeq(T v, Vector<T> v2){
 		Vector<T> v1 = new Vector<T>();
 		v1.add(v);
 		return joinSeq(v1,v2);
 	}
 	
+	public static <T> Vector<T> joinSeq(T v, Vector<T> v2, int maxseq){
+		Vector<T> v1 = new Vector<T>();
+		v1.add(v);
+		return joinSeq(v1,v2, maxseq);
+	}
+	
 	public static <T> Vector<T> joinSeq(Vector<T> v1, T v){
 		Vector<T> v2 = new Vector<T>();
 		v2.add(v);
 		return joinSeq(v1,v2);
+	}
+	
+	public static <T> Vector<T> joinSeq(Vector<T> v1, T v, int maxseq){
+		Vector<T> v2 = new Vector<T>();
+		v2.add(v);
+		return joinSeq(v1,v2, maxseq);
 	}
 	
 	/**
@@ -361,6 +413,49 @@ public class SetOperation {
 		return divs(freq,v.size());
 	}
 	
+	public static <T> Vector<T> ones(int length, T initV){
+		Vector<T> os = new Vector<T>();
+		for(int i=0; i<length; i++){
+			os.add(initV);
+		}
+		return os;
+	}
+	
+	public static Vector<Integer> arithmeticProgression(int length, int initV, int diff){
+		Vector<Integer> progs = new Vector<Integer>();
+		for(int i=0; i<length; i++){
+			progs.add(initV);
+			initV += diff;
+		}
+		return progs;
+	}
+	
+	public static Vector<Integer> arithmeticProgression(int length, int initV){
+		return arithmeticProgression(length, initV, 1);
+	}
+	
+	public static Vector<Integer> arithmeticProgression(int length){
+		return arithmeticProgression(length, 0);
+	}
+	
+	public static Vector<Double> arithmeticProgression(int length, double initV, double diff){
+		Vector<Double> progs = new Vector<Double>();
+		for(int i=0; i<length; i++){
+			progs.add(initV+diff);
+			initV += diff;
+		}
+		return progs;
+	}
+	
+	/**
+	 * Return a vector containing only one indicated element
+	 * @return
+	 */
+	public static <T> Vector<T> singleton(T el){
+		Vector<T> v = new Vector<T>();
+		v.add(el);
+		return v;
+	}
 	//---------end of vector operations-----------
 
 	//---------matrix operations----------
@@ -413,6 +508,7 @@ public class SetOperation {
 	 * @param mx
 	 * @return the transposation of matrix mx
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> Vector<Vector<T>> transposeMatrix(Vector<Vector<T>> mx){
 		Vector<Vector<T>> trMt = new Vector<Vector<T>>();
 		if(mx.size()==0) return trMt;
@@ -476,8 +572,6 @@ public class SetOperation {
 	}
 	
 	public void testMapEquivalence(){
-		SetOperation st = new SetOperation();
-		//st.testSort();
 		double[] as = {1.1,2.3,3.4};
 		double[] bs = {1.1,2.3,3.4};
 		Vector<Double> av = Transformation.doubleAry2Vec(as);
@@ -491,15 +585,26 @@ public class SetOperation {
 		
 		System.out.println(mp.containsKey(bv));
 	}
-	//---------end of Test Programs--------------
 	
-	public static void main(String[] args){
+	public void testFrequence(){
 		int[] as = {1,2,2,3,3,4,1,1,2};
 		Vector<Integer> av = Transformation.intAry2Vec(as);
 		Presentation.showSeq(av);
 		System.out.println(frequence(av));
 		System.out.println(frequencePortion(av));
-
+	}
+	
+	public void testVectorOperations(){
+		Vector<Integer> v = arithmeticProgression(3);
+		Vector<Integer> v2 = arithmeticProgression(2, 4);
+		Presentation.showSeqln(joinSeq(v,v2,3));
+		Presentation.showSeqln(v);
+	}
+	//---------end of Test Programs--------------
+	
+	public static void main(String[] args){
+		SetOperation st = new SetOperation();
+		st.testVectorOperations();
 	}
 	
 }

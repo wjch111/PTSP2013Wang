@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import controllers.utils.Debug;
-import controllers.utils.Presentation;
+import controllers.utils.Logger;
 import controllers.utils.SetOperation;
 import controllers.utils.Transformation;
 
@@ -18,16 +18,17 @@ import controllers.utils.Transformation;
 public class TestPlanner extends MOMCTS{
 	public TestPlanner(){
 		//super(objectives, RdomType, maximize, raveLocal, defDiscount, raveLocal, defDiscount);
-		super("test"+RdomType, true, 0.5, 10, 1);
+		super("test"+RdomType, true, 0.5, 10, 0.95);
 		String[] objs = {"a","b","c"};
 		Vector<String> objv = Transformation.strAry2Vec(objs);
 		setObjectives(objv);
+		this.setSolNbLimitPerPoint(3);
 	}
 
 	@Override
 	public Vector<Integer> candidateActions(MOUCT parentNode) {
 		Vector<Integer> acts = new Vector<Integer>();
-		if(parentNode != null && parentNode.getContext().size()>=5) return acts;
+		if(parentNode != null && parentNode.getContext().size()>5) return acts;
 		for(int i=0; i< 4 ;i++){
 			acts.add(i);
 		}
@@ -55,19 +56,17 @@ public class TestPlanner extends MOMCTS{
 	
 	public static void main(String[] args){
 		TestPlanner planner = new TestPlanner();
+		Logger log1 = new Logger("rootLog");
+		Logger log2 = new Logger("leafLog");
 		int time = 1000;
 		while(time >= 0){
-			if(time%100==0){
-				Debug.debug(planner.smt);
-				//planner.getRoot().showSelf();
-				//Presentation.spr();
-			}
-			planner.playOneSequence();
+			Vector<MOUCT>  path = planner.playOneSequence();
+			log1.write(""+planner.getSmt()+"\t"+path.firstElement().getRwd(planner.getMetaRewardType()));
+			log2.write(""+planner.getSmt()+"\t"+path.lastElement().getRwd(planner.getMetaRewardType()));			
 			time--;
 		}
-		
-		planner.getRoot().showSelf(2, planner.getMetaRewardType());
-		Presentation.showMatrix(planner.getArchive().getPoints());
+		planner.getRoot().showSelf(1, SetOperation.singleton(planner.getMetaRewardType()), false);
+		Debug.debug(planner.getArchive().getPoints().size());//.showPntSols();
+		Debug.debug(planner.getOptimalSolutions().size());
 	}
-
 }
