@@ -87,7 +87,6 @@ public class MacroRSController extends Controller {
         int nextMacroAction;
 
         if(wptVistNb != a_game.getWaypointsLeft()){
-        	Debug.showSeq(new Vector(a_game.getVisitOrder()));	
         	wptVistNb = a_game.getWaypointsLeft();
         }
         

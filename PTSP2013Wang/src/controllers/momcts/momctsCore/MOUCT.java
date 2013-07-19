@@ -173,7 +173,7 @@ public class MOUCT {
 	public double incrementRwd(String rwdType, double r, double discount){
 		Double orgR = this.getRwd(rwdType);
 		Double orgN = this.getNb(rwdType);
-		if(rwdType.contains("Dom")) Debug.debug(orgR+" "+orgN);
+		//if(rwdType.contains("Dom")) Debug.debug(orgR+" "+orgN);
 		if(orgR == null) {
 			orgR = 0.;
 			orgN = 0.;
@@ -314,7 +314,7 @@ public class MOUCT {
 		for(int i=0; i<rwdTypes.size();i++){
 			String tp = rwdTypes.get(i);
 			double r = avgR(tp, 4);
-			if(!avg) r = getRwd(tp, 4); 
+			if(!avg) r = getRwd(tp, 4);
 			System.out.print("\t"+tp+":"+r);
 		}
 
@@ -343,10 +343,14 @@ public class MOUCT {
 		showSelf(limit, rwdTypes, true);
 	}
 	
-	public void showSelf(int limit,String rwdType){
+	public void showSelf(int limit,String rwdType, boolean avg){
 		Vector<String> rwdTypes = new Vector<String>();
 		rwdTypes.add(rwdType);
-		showSelf(limit, rwdTypes);
+		showSelf(limit, rwdTypes, avg);
+	}
+	
+	public void showSelf(int limit,String rwdType){
+		showSelf(limit, rwdType, true);
 	}
 	
 	public void showSelf(int limit){
@@ -450,9 +454,27 @@ public class MOUCT {
 	public static Vector<Integer> extractActs(Vector<MOUCT> nodes){
 		Vector<Integer> acts = new Vector<Integer>();
 		for(MOUCT n: nodes){
-			acts.add(n.getAction());
+			int a = n.getAction();
+			if(a!=-1) acts.add(a);
 		}
 		return acts;
+	}
+	
+	/**
+	 * When we set a subtree as the root node, contexts of all son nodes from such subtree should be modified 
+	 */
+	public void resetAsRoot(){
+		action = -1;
+		resetSonContexts(new Vector<Integer>());
+	}
+	
+	public void resetSonContexts(Vector<Integer> cntxt){
+		context = cntxt;
+		Vector<Integer> newCntxt = (Vector<Integer>) cntxt.clone();
+		newCntxt.add(this.action);
+		for(MOUCT s : sons){
+			s.resetSonContexts(newCntxt);
+		}
 	}
 	
 	public static void main(String[] args){

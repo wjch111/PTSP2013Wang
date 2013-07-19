@@ -9,12 +9,20 @@ public class Debug {
 		System.out.println("=OK=");		
 	}
 	
+	public static void debug(String s, String deco){
+		System.out.println(deco+s+deco);
+	}
+	
 	public static void debug(String s){
-		System.out.println("="+s+"=");
+		debug(s,"=");
+	}
+	
+	public static void debug(Object s, String deco){
+		debug(""+s, deco);
 	}
 	
 	public static void debug(Object s){
-		debug(""+s);
+		debug(s, "=");
 	}
 	
 	public static void showSeq(Vector<Integer> is){

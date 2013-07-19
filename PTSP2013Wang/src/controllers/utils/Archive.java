@@ -61,6 +61,10 @@ public class Archive {
 		else return new Vector<Vector<Integer>>();
 	}
 	
+	public Vector<Integer> getOneSol(Vector<Double> pnt){
+		return SetOperation.randomElement(getSols(pnt));
+	}
+	
 	/**
 	 * Add a new point pnt in the archive
 	 * @param pnt
@@ -104,12 +108,49 @@ public class Archive {
 		return points;
 	}
 	
-	public Vector<Vector<Integer>> getSolutions(){
+	public Vector<Vector<Integer>> getAllSolutions(){
 		Vector<Vector<Integer>> allSols = new Vector<Vector<Integer>>();
 		for(Vector<Double> p : points){
 			allSols.addAll(pnt2sols.get(p));
 		}
 		return allSols;
+	}
+	
+	/**
+	 * Get the weighted sum of all objectives of each point according to the given weights
+	 * @param wts	weights associated to each dimension in the point
+	 * @return
+	 */
+	public Vector<Double> getPointScores(Vector<Double> wts){
+		Vector<Double> sums = new Vector<Double>();
+		for(Vector<Double> p : points){
+			sums.add(SetOperation.weightedSum(p, wts));
+		}
+		return sums;
+	}
+	
+	public Vector<Double> getBestPoint(Vector<Double> wts, boolean maximize){
+		Vector<Double> rks = getPointScores(wts);
+		return SetOperation.getBestItem(points, rks, maximize);		
+	}
+	
+	public double getBestScore(Vector<Double> wts, boolean maximize){
+		Vector<Double> rks = getPointScores(wts);
+		return SetOperation.getBestItem(rks, maximize);		
+	}
+	
+	/**
+	 * Return the solution of the point whose weighted sum is the best (minimum or maximum)
+	 * @param wts
+	 * @param maximize
+	 * @return
+	 */
+	public Vector<Vector<Integer>> getBestSolutions(Vector<Double> wts, boolean maximize){
+		return getSols(getBestPoint(wts, maximize));
+	}
+	
+	public Vector<Integer> getBestSol(Vector<Double> wts, boolean maximize){
+		return SetOperation.randomElement(getBestSolutions(wts,maximize));
 	}
 	
 	public void showPntSol(){

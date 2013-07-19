@@ -334,18 +334,14 @@ public abstract class MOMCTS {
 	}
 	
 	public Vector<Vector<Integer>> getOptimalSolutions(){
-		return archive.getSolutions();
+		return archive.getAllSolutions();
 	}
 	
-	@SuppressWarnings("static-access")
 	protected double updateDomReward(Vector<MOUCT> nodes, Vector<Double> newPnt, int age, String rwdType){
 		double domRwd = 0;
 		if(MOOTools.dominatesSet(newPnt,archive.getPoints(),maximize)) domRwd = 1;
 		MOUCT.update(nodes, rwdType, domRwd, age, defDiscount);		
-		if(domRwd > 0) {
-			System.out.println(domRwd);
-			debugger.debug(smt+" "+root.getRwd(rwdType));
-		}
+		
 		return domRwd;
 	}
 	
@@ -367,7 +363,7 @@ public abstract class MOMCTS {
 			int n1 = (int) Math.pow(nb-1, pwConst);
 			int n2 = (int) Math.pow(nb, pwConst);
 			
-			if(nb == 0 || (n2>n1 && currNd.getSons().size() < candAs.size()) ) {
+			if(nb == 0 || currNd.getSons().size() == 0 || (n2>n1 && currNd.getSons().size() < candAs.size()) ) {
 				//Unexecuted actions
 				Vector<Integer> unplayedActs = SetOperation.complementSet(candAs, currNd.sonActions());
 				int newAct = SetOperation.randomElement(unplayedActs);
@@ -382,7 +378,8 @@ public abstract class MOMCTS {
 				if(actValues.size() > 0) newAct = SetOperation.getBestItem(unplayedActs, actValues, maximize);
 				nodes.add(currNd.addSon(newAct));
 			} else {
-				if(metaRewardType.contains(RdomType)) nodes.add(bestUCB(currNd, metaRewardType, false));
+				if(metaRewardType.contains(RdomType)) nodes.add(bestUCB(currNd, metaRewardType, false));//
+				//if(metaRewardType.contains(RdomType)) nodes.add(SetOperation.randomElement(currNd.getSons()));
 				else nodes.add(bestUCB(currNd, metaRewardType, true));
 			}
 			currNd = nodes.lastElement();
@@ -402,7 +399,7 @@ public abstract class MOMCTS {
 			r = updateDomReward(nodes, objRwds, smt, metaRewardType);
 			if(r!=0) {
 				debugger.counter += r;
-				debugger.debug(smt+" "+debugger.counter);
+				//Debug.debug(smt+" "+debugger.counter);
 			}
 		}
 		//else if(strContains(metaRewardType, RrkType)) r = updateRankReward(nodes, newPnt, smt, metaRewardType);

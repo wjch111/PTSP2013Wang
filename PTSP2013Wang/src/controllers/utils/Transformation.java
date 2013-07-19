@@ -49,6 +49,7 @@ public class Transformation {
 		}
 		return ds;
 	}
+
 	
 	/**
 	 * Given the keys and values, return a correspondent map
@@ -64,5 +65,10 @@ public class Transformation {
 			mp.put(keys.get(i), values.get(i%vlSize));
 		}		
 		return mp;
+	}
+	
+	
+	public static void main(String[] args){
+
 	}
 }

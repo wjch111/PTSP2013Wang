@@ -178,8 +178,7 @@ public class ExecSync extends Exec
             double avgFuel=0;
             int numGamesPlayed = 0;
 
-            if(m_verbose)
-            {
+            if(m_verbose){
                 System.out.println("--------");
                 System.out.println("Running " + m_controllerName + " in map " + mapName + "...");
             }
@@ -277,18 +276,16 @@ public class ExecSync extends Exec
      */
     public static void main(String[] args)
     {
-    	Debug dbg = new Debug();
-        dbg.debug();
-        //m_mapNames = new String[]{"maps/ptsp_map01.map"}; //Set here the name of the map to play in.
-        m_mapNames = new String[]{"maps/ptsp_map24.map"};//,"maps/ptsp_map02.map","maps/ptsp_map19.map","maps/ptsp_map24.map","maps/ptsp_map35.map","maps/ptsp_map40.map","maps/ptsp_map45.map","maps/ptsp_map56.map","maps/ptsp_map61.map"}; //In an array, to play in mutiple maps with runGames().
+        m_mapNames = new String[]{"maps/ptsp_map02.map"}; //Set here the name of the map to play in.
+        //m_mapNames = new String[]{"maps/ptsp_map24.map"};//,"maps/ptsp_map02.map","maps/ptsp_map19.map","maps/ptsp_map24.map","maps/ptsp_map35.map","maps/ptsp_map40.map","maps/ptsp_map45.map","maps/ptsp_map56.map","maps/ptsp_map61.map"}; //In an array, to play in mutiple maps with runGames().
 
         //m_controllerName = "controllers.greedy.GreedyController"; //Set here the controller name.
-        m_controllerName = "controllers.MacroRandomSearch.MacroRSController"; //Set here the controller name.
+        //m_controllerName = "controllers.MacroRandomSearch.MacroRSController"; //Set here the controller name.
         //m_controllerName = "controllers.lineofsight.LineOfSight";
         //m_controllerName = "controllers.random.RandomController";
         //m_controllerName = "controllers.WoxController.WoxController"; //Set here the controller name. Leave it to null to play with KeyController.
         
-        //m_controllerName = "controllers.momcts.ExpController";
+        m_controllerName = "controllers.momcts.MOMCTSController";
         
         m_visibility = true;//Set here if the graphics must be displayed or not (for those modes where graphics are allowed).
         m_writeOutput = false;//true;//Indicate if the actions must be saved to a file after the end of the game (the file name will be the current date and time)..

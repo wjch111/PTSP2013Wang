@@ -192,6 +192,25 @@ public class SetOperation {
 		return getBestItem(mp, false);
 	}
 	
+	
+	public static <T extends Comparable<T>> T getBestItem(Vector<T> v, boolean maximize){
+		T best = randomElement(v);
+		for(T el : v){
+			//Collections.
+			if(maximize && el.compareTo(best) > 0) best = el;
+			else if(!maximize && el.compareTo(best) < 0) best = el;
+		}
+		return best;
+	}
+	
+	public static <T extends Comparable<T>> T maxItem(Vector<T> v){
+		return getBestItem(v, true);
+	}
+	
+	public static <T extends Comparable<T>> T minItem(Vector<T> v){
+		return getBestItem(v, false);
+	}
+	
 	/**
 	 * Return the value of key k in map, if k does not exist in map, then return 0.0
 	 * @param map
@@ -211,7 +230,18 @@ public class SetOperation {
 		if(v == null) return 0;
 		else return (java.lang.Integer) v;
 	}
+	
+	public static <T extends Comparable<T>> boolean isBetter(T a, T b, boolean maximize, boolean strict){
+		if( (maximize && a.compareTo(b) > 0) || (!maximize && a.compareTo(b)<0)){
+			return true;
+		}
+		if(!strict) return a.compareTo(b)==0;
+		return false;
+	}
 
+	public static <T extends Comparable<T>> boolean isBetter(T a, T b, boolean maximize){
+		return isBetter(a,b,maximize, true);
+	}
 	//---------Vector arithmatic Operators-----------
 	/**
 	 * Calculate addition of vectors a and b
@@ -456,6 +486,14 @@ public class SetOperation {
 		v.add(el);
 		return v;
 	}
+	
+	public static double weightedSum(Vector<Double> v, Vector<Double> wts){
+		double sum = 0;
+		for(int i=0; i<v.size();i++){
+			sum += v.get(i)*wts.get(i%wts.size());
+		}
+		return sum;
+	}
 	//---------end of vector operations-----------
 
 	//---------matrix operations----------
@@ -596,15 +634,20 @@ public class SetOperation {
 	
 	public void testVectorOperations(){
 		Vector<Integer> v = arithmeticProgression(3);
-		Vector<Integer> v2 = arithmeticProgression(2, 4);
-		Presentation.showSeqln(joinSeq(v,v2,3));
-		Presentation.showSeqln(v);
+		Vector<Integer> v2 = arithmeticProgression(2, 4,-1);
+		v2 = joinSeq(v,v2,3);
+		Presentation.showSeqln(v2);
+		Debug.debug(minItem(v2));
+	}
+	
+	public void testComparison(){
+		System.out.println(isBetter(5.0,5.0,true, false));
 	}
 	//---------end of Test Programs--------------
 	
 	public static void main(String[] args){
 		SetOperation st = new SetOperation();
-		st.testVectorOperations();
+		st.testComparison();
 	}
 	
 }

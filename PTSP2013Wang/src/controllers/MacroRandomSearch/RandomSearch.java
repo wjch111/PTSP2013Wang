@@ -1,12 +1,19 @@
 package controllers.MacroRandomSearch;
 
-import framework.core.*;
-import framework.graph.Node;
-import framework.graph.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+
+import controllers.utils.Debug;
+import controllers.utils.Presentation;
+import controllers.utils.Transformation;
+import framework.core.Controller;
+import framework.core.Game;
+import framework.core.GameObject;
+import framework.core.Waypoint;
+import framework.graph.Node;
+import framework.graph.Path;
 
 /**
  * PTSP-Competition
@@ -124,7 +131,6 @@ public class RandomSearch
         {
             //create and evaluate a new random path.
             double randomPathFitness = createRandomPath(a_timeDue);
-
             //keep the best one.
             if(randomPathFitness > m_bestFitnessFound)
             {
@@ -134,7 +140,6 @@ public class RandomSearch
             //update remaining time.
             remaining = (a_timeDue-System.currentTimeMillis());
         }
-
         //take the best one so far, the best macroaction is the first one of the path.
         return m_bestRandomPath[0];
     }

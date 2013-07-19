@@ -8,7 +8,8 @@ import framework.utils.Vector2d;
 import java.util.TreeMap;
 
 /**
- * This class is based on TSPBranchBound class, and aims at providing a Hamilton path that visits all way points in the map
+ * This class is based on TSPBranchBound class created by Diego Perez, 
+ * and aims at providing a Hamilton path that visits all way points in the map
  * @author wj 
  * @date 2013/07/11
  */

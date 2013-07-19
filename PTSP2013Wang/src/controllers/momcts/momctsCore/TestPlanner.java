@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import controllers.utils.Debug;
 import controllers.utils.Logger;
+import controllers.utils.Presentation;
 import controllers.utils.SetOperation;
 import controllers.utils.Transformation;
 
@@ -18,11 +19,12 @@ import controllers.utils.Transformation;
 public class TestPlanner extends MOMCTS{
 	public TestPlanner(){
 		//super(objectives, RdomType, maximize, raveLocal, defDiscount, raveLocal, defDiscount);
-		super("test"+RdomType, true, 0.5, 10, 0.95);
+		super("test"+RdomType, true, 0.5, 10, 0.99);
 		String[] objs = {"a","b","c"};
 		Vector<String> objv = Transformation.strAry2Vec(objs);
 		setObjectives(objv);
 		this.setSolNbLimitPerPoint(3);
+		this.setEvEConst(metaRewardType, 0.05);
 	}
 
 	@Override
@@ -42,6 +44,9 @@ public class TestPlanner extends MOMCTS{
 		rwds.add(SetOperation.getDoubleValue(freq, 0));
 		rwds.add(SetOperation.getDoubleValue(freq, 1));
 		rwds.add(SetOperation.getDoubleValue(freq, 2));
+		//rwds.add(0.5);
+		//rwds.add(0.);
+		//rwds.add(0.);
 		return rwds;
 	}
 
@@ -65,8 +70,28 @@ public class TestPlanner extends MOMCTS{
 			log2.write(""+planner.getSmt()+"\t"+path.lastElement().getRwd(planner.getMetaRewardType()));			
 			time--;
 		}
-		planner.getRoot().showSelf(1, SetOperation.singleton(planner.getMetaRewardType()), false);
-		Debug.debug(planner.getArchive().getPoints().size());//.showPntSols();
-		Debug.debug(planner.getOptimalSolutions().size());
+		planner.getRoot().showSelf(1);
+		Presentation.spr();
+
+		planner.getArchive().showPntSols();
+		Presentation.spr("~");
+		
+		
+		Vector<Double> pref = SetOperation.ones(3, 0.);
+		pref.set(1, 1.0);
+		Vector<Double> optPnt = planner.getArchive().getBestPoint(pref, planner.isMaximize());
+		Vector<Integer> optSol = planner.getArchive().getBestSol(pref, planner.isMaximize());
+		Presentation.showSeqln(optPnt);
+		Presentation.showSeqln(optSol);
+		Presentation.spr("~");
+		int act = optSol.firstElement();
+		MOUCT s = planner.getRoot().findSon(act);
+		s.getSon(0).showSelf(1);
+		Presentation.spr();
+		s.resetAsRoot();
+		s.getSon(0).showSelf(1);
+		
+		//Debug.debug(planner.getArchive().getPoints().size());//
+		//Debug.debug(planner.getOptimalSolutions().size());
 	}
 }
