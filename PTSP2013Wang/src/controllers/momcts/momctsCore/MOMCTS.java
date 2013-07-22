@@ -3,11 +3,11 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
-import controllers.utils.Archive;
-import controllers.utils.Debug;
-import controllers.utils.MOOTools;
-import controllers.utils.Presentation;
-import controllers.utils.SetOperation;
+import controllers.momcts.utils.Archive;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.MOOTools;
+import controllers.momcts.utils.Presentation;
+import controllers.momcts.utils.SetOperation;
 
 /**
  * Based on Monte-Carlo Tree Search algorithm, MOMCTS (Multi-Objective Monte-Carlo Tree Search) 
@@ -82,9 +82,13 @@ public abstract class MOMCTS {
 	
 	//-------------end of MOMCTS parameters---------------------
 	
+	//-------------Real time control parameters-----------------
+	public static int seqTimeGranularity = 10;
+	//-------------end of real time control parameters----------
+	
 	
 	//-------------Debug paramaters---------------
-	protected Debug debugger = new Debug();
+	protected Debug dbg = new Debug();
 	//-------------end of debug parameters--------
 	
 	public MOMCTS(String metaRewardType, boolean maximize,
@@ -103,7 +107,7 @@ public abstract class MOMCTS {
 		this.smt = 0;
 		this.solNbLimitPerPoint = -1;
 		
-		debugger.counter=0;
+		dbg.counter=0;
 	}
 	
 	public void setObjectives(Vector<String> objs){
@@ -349,13 +353,15 @@ public abstract class MOMCTS {
 	 * Simulate one tree-walk in MOMCTS
 	 * @return the nodes visited in this tree walk
 	 */
-	public Vector<MOUCT> playOneSequence(boolean pwEnabled, String nbType, boolean raveOn, boolean localRaveOn){
+	public Vector<MOUCT> playOneSequence(long a_timeDue, boolean pwEnabled, String nbType, boolean raveOn, boolean localRaveOn){
 		//The sequence of nodes visited during the tree walk
 		Vector<MOUCT> nodes = new Vector<MOUCT>();
 		nodes.add(root);
 		MOUCT currNd = nodes.lastElement();
+		double remaining = seqTimeGranularity+1;
+		if(a_timeDue > 0) remaining = a_timeDue-System.currentTimeMillis();
 		
-		while(currNd.isRoot() || currNd.getNb(nbType)>0){
+		while(remaining > seqTimeGranularity && (currNd.isRoot() || currNd.getNb(nbType)>0)){
 			Vector<Integer> candAs = candidateActions(currNd);
 			if(candAs.size()==0) break;//when there is no more action to execute (terminal state reached), stop the path finding
 			
@@ -383,43 +389,46 @@ public abstract class MOMCTS {
 				else nodes.add(bestUCB(currNd, metaRewardType, true));
 			}
 			currNd = nodes.lastElement();
+			if(a_timeDue > 0) remaining = a_timeDue-System.currentTimeMillis();
 		}
+		//dbg.stopWatch();
 		
 		Vector<Integer> path = MOUCT.extractActs(nodes);
 		Vector<Integer> randomPath = generateRandomPath(currNd);
 
-		Vector<Integer> strtgy = SetOperation.joinSeq(path,randomPath);		
+		Vector<Integer> strtgy = SetOperation.joinSeq(path,randomPath);
 		Vector<Double> objRwds = evaluateSeq(strtgy);
+		//Debug.debug(dbg.stopWatch()+":"+root.size(),"!");
 		
 		updateRwds(nodes, objectives, objRwds, smt);//basic rewards in each objective updated
 		updateRAVEs(nodes, randomPath, objectives, objRwds);
 
 		double r = 0;
-		if(metaRewardType.contains(RdomType)) {
-			r = updateDomReward(nodes, objRwds, smt, metaRewardType);
-			if(r!=0) {
-				debugger.counter += r;
-				//Debug.debug(smt+" "+debugger.counter);
-			}
-		}
+		if(metaRewardType.contains(RdomType)) r = updateDomReward(nodes, objRwds, smt, metaRewardType);
 		//else if(strContains(metaRewardType, RrkType)) r = updateRankReward(nodes, newPnt, smt, metaRewardType);
 		//else if(strContains(metaRewardType, RhviType)) r = updateHviReward(nodes, newPnt, smt, metaRewardType);
 		//else if(strContains(metaRewardType, RprRkType)) r = updatePrRkReward(nodes, newPnt, smt, metaRewardType);
 		root.updateRAVE(randomPath, metaRewardType, r);
 		updateArchive(objRwds, strtgy);
 		smt++;
+		//Debug.debug(dbg.stopWatch(),"!");
+		//Presentation.spr();
 		return nodes;
 	}
 	
-	public Vector<MOUCT> playOneSequence(boolean pwEnabled, String nbType){
-		return playOneSequence(pwEnabled, nbType, false, false);
+	public Vector<MOUCT> playOneSequence(long a_timeDue, boolean pwEnabled, String nbType){
+		return playOneSequence(a_timeDue, pwEnabled, nbType, false, false);
 	}
 	
-	public Vector<MOUCT> playOneSequence(boolean pwEnabled){
-		return playOneSequence(pwEnabled, objectives.firstElement());
+	public Vector<MOUCT> playOneSequence(long a_timeDue, boolean pwEnabled){
+		return playOneSequence(a_timeDue, pwEnabled, objectives.firstElement());
+	}
+	
+	public Vector<MOUCT> playOneSequence(long a_timeDue){
+		return playOneSequence(a_timeDue, false);
 	}
 	
 	public Vector<MOUCT> playOneSequence(){
-		return playOneSequence(false);
+		return playOneSequence(0);
 	}
 }

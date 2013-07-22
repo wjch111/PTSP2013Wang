@@ -1,7 +1,8 @@
 package controllers.momcts;
 
 //import controllers.utils.Debug;
-import controllers.utils.Debug;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.Presentation;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.graph.Graph;
@@ -59,6 +60,11 @@ public class MOMCTSController extends Controller{
      */
     private int wptVistNb;
     
+    //-----------Debug use----------------
+    public Debug dbg = new Debug();
+    //-----------end of debug use--------
+    
+    
     public MOMCTSController(Game a_game, long a_timeDue){
         m_resetRS = true;
         m_graph = new Graph(a_game);
@@ -76,7 +82,6 @@ public class MOMCTSController extends Controller{
 	public int getAction(Game a_game, long a_timeDue) {
     	int cycle = a_game.getTotalTime();
         int nextMacroAction;
-
         if(wptVistNb != a_game.getWaypointsLeft()){
         	wptVistNb = a_game.getWaypointsLeft();
         }
@@ -88,11 +93,15 @@ public class MOMCTSController extends Controller{
             m_lastMacroActionExecuted = m_macroActionUnderExecution;
             m_resetRS = true;
             m_executedMacroActionNb = ShortNavigator.MACRO_ACTION_LENGTH-1;
+            
+            dbg.resetMemoryCount();
         } else {
             //advance the game until the last action of the macro action
             prepareGameCopy(a_game);
+
             if(m_executedMacroActionNb > 0){
-                if(m_resetRS){
+                dbg.stopWatch();
+            	if(m_resetRS){
                     //search needs to be restarted.
                     m_p2pNivgator.init(m_lastMacroActionExecuted);
                 }
@@ -103,7 +112,7 @@ public class MOMCTSController extends Controller{
                 m_executedMacroActionNb--;
                 m_resetRS = false;
             } else if(m_executedMacroActionNb == 0){
-                nextMacroAction = m_macroActionUnderExecution; //default value
+            	nextMacroAction = m_macroActionUnderExecution; //default value
                 //keep searching and retrieve the action suggested by the random search engine.
                 int suggestedAction = m_p2pNivgator.run(a_game, a_timeDue);
                 //now it's time to execute this action. Also, in next cycle, we need to reset the search
@@ -117,6 +126,8 @@ public class MOMCTSController extends Controller{
             	throw new RuntimeException("This should not be happening: " + m_executedMacroActionNb);
             }
         }
+        
+        //Debug.debug(dbg.getMemoryChangeMB()+" MB");
         return nextMacroAction;
 	}
 

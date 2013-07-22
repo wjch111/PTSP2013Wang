@@ -3,11 +3,11 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
-import controllers.utils.Debug;
-import controllers.utils.Logger;
-import controllers.utils.Presentation;
-import controllers.utils.SetOperation;
-import controllers.utils.Transformation;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.Logger;
+import controllers.momcts.utils.Presentation;
+import controllers.momcts.utils.SetOperation;
+import controllers.momcts.utils.Transformation;
 
 /**
  * This planner is an instantiation of the abstract class MOMCTS. It is created to test the MOMCTS algorithm

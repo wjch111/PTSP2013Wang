@@ -3,7 +3,7 @@ package controllers.MacroRandomSearch;
 import java.awt.Graphics2D;
 import java.util.Vector;
 
-import controllers.utils.Debug;
+import controllers.momcts.utils.Debug;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.graph.Graph;

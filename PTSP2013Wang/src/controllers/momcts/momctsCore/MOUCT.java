@@ -3,9 +3,9 @@ package controllers.momcts.momctsCore;
 import java.util.HashMap;
 import java.util.Vector;
 
-import controllers.utils.Debug;
-import controllers.utils.Presentation;
-import controllers.utils.SetOperation;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.Presentation;
+import controllers.momcts.utils.SetOperation;
 
 
 /**
@@ -286,6 +286,14 @@ public class MOUCT {
 	
 	public boolean isRoot(){
 		return context.size()==0;
+	}
+	
+	public int size(){
+		int sz = 1;
+		for(MOUCT s : sons){
+			sz += s.size();
+		}
+		return sz;
 	}
 	
 	/**

@@ -1,7 +1,7 @@
 package framework;
 
 import controllers.keycontroller.KeyController;
-import controllers.utils.Debug;
+import controllers.momcts.utils.Debug;
 import framework.core.*;
 import framework.graph.Graph;
 import framework.utils.JEasyFrame;
@@ -92,7 +92,6 @@ public class ExecSync extends Exec
         if(!prepareGame())
             return;
 
-
         //Indicate what are we running
         if(m_verbose) System.out.println("Running " + m_controllerName + " in map " + m_game.getMap().getFilename() + "...");
 
@@ -109,14 +108,13 @@ public class ExecSync extends Exec
             //When the result is expected:
             long then = System.currentTimeMillis();
             long due = then + PTSPConstants.ACTION_TIME_MS;
-
             //Advance the game.
             int actionToExecute = m_controller.getAction(m_game.getCopy(), due);
-            //DebugTools.debug(""+actionToExecute);
 
             //Exceeded time
             long now = System.currentTimeMillis();
             long spent = now - then;
+            Debug.debug(spent);
 
             if(spent > PTSPConstants.TIME_ACTION_DISQ)
             {
@@ -276,7 +274,7 @@ public class ExecSync extends Exec
      */
     public static void main(String[] args)
     {
-        m_mapNames = new String[]{"maps/ptsp_map02.map"}; //Set here the name of the map to play in.
+        m_mapNames = new String[]{"maps/ptsp_map19.map"}; //Set here the name of the map to play in.
         //m_mapNames = new String[]{"maps/ptsp_map24.map"};//,"maps/ptsp_map02.map","maps/ptsp_map19.map","maps/ptsp_map24.map","maps/ptsp_map35.map","maps/ptsp_map40.map","maps/ptsp_map45.map","maps/ptsp_map56.map","maps/ptsp_map61.map"}; //In an array, to play in mutiple maps with runGames().
 
         //m_controllerName = "controllers.greedy.GreedyController"; //Set here the controller name.
@@ -298,12 +296,12 @@ public class ExecSync extends Exec
         //playGame(delay);
 
         /////// 2. Executes one game.
-        int delay = 1;//PTSPConstants.ACTION_TIME_MS;  //1: quickest; PTSPConstants.DELAY: human play speed, PTSPConstants.ACTION_TIME_MS: max. controller delay
-        runGame(m_visibility, delay);
+        //int delay = 1;//PTSPConstants.ACTION_TIME_MS;  //1: quickest; PTSPConstants.DELAY: human play speed, PTSPConstants.ACTION_TIME_MS: max. controller delay
+        //runGame(m_visibility, delay);
 
         ////// 3. Executes N games (numMaps x numTrials), graphics disabled.
-        //int numTrials=10;
-        //runGames(numTrials);
+        int numTrials=5;
+        runGames(numTrials);
     }
 
 }

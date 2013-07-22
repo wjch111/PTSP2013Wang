@@ -6,11 +6,11 @@ import java.util.Vector;
 
 import controllers.momcts.momctsCore.MOMCTS;
 import controllers.momcts.momctsCore.MOUCT;
-import controllers.utils.Archive;
-import controllers.utils.Debug;
-import controllers.utils.Presentation;
-import controllers.utils.SetOperation;
-import controllers.utils.Transformation;
+import controllers.momcts.utils.Archive;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.Presentation;
+import controllers.momcts.utils.SetOperation;
+import controllers.momcts.utils.Transformation;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.core.GameObject;
@@ -73,10 +73,17 @@ public class ShortNavigator extends MOMCTS{
      */
     public static int MACRO_ACTION_LENGTH = 10;
     
-    public static int seqTimeGranularity = 20;
-    
+    public static int seqTimeGranularity = 10;
+    /**
+     * Record the user preference which determines the priorities between non-dominated solutions
+     */
     private Vector<Double> prefs;
     //-----------end of parameters-------------
+    
+    
+    //-----------Debug use----------------
+    public Debug dbg = new Debug();
+    //-----------end of debug use--------
 
 	public ShortNavigator() {
 		super(ShortNavigator.class.getName()+RdomType , false, 0.5, 10, 0.5);
@@ -114,7 +121,8 @@ public class ShortNavigator extends MOMCTS{
             }
         }
         //At the end of the random path, return evaluation of the reached state.
-        return gameRewards();
+        Vector<Double> rs = gameRewards();
+        return rs;
 	}
 
 	@Override
@@ -247,7 +255,7 @@ public class ShortNavigator extends MOMCTS{
         }
         m_bestFitnessFound = 100000;
         
-        MOUCT s = root.findSon(lastActionExecuted);
+        MOUCT s = null;//root.findSon(lastActionExecuted);
         if(s==null) root = new MOUCT(-1);
         else {
         	s.resetAsRoot();
@@ -271,7 +279,7 @@ public class ShortNavigator extends MOMCTS{
     	//root.showSelf(2);
         //check that we don't overspend
         while(remaining > seqTimeGranularity){
-        	playOneSequence();
+        	playOneSequence(a_timeDue);
             //create and evaluate a new random path.
         	Vector<Double> optPnt = archive.getBestPoint(prefs, maximize);
             double optPathFitness = SetOperation.weightedSum(optPnt, prefs);
@@ -285,6 +293,7 @@ public class ShortNavigator extends MOMCTS{
             //update remaining time.
             remaining = (a_timeDue-System.currentTimeMillis());
         }
+        //Presentation.spr();
 
         //take the best one so far, the best macroaction is the first one of the path.
         return m_bestRandomPath[0];

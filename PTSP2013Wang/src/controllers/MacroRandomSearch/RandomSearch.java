@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
-import controllers.utils.Debug;
-import controllers.utils.Presentation;
-import controllers.utils.Transformation;
+import controllers.momcts.utils.Debug;
+import controllers.momcts.utils.Presentation;
+import controllers.momcts.utils.Transformation;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.core.GameObject;

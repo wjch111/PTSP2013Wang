@@ -1,5 +1,5 @@
 package framework;
-import controllers.utils.Debug;
+import controllers.momcts.utils.Debug;
 import framework.core.Exec;
 import framework.core.Game;
 import framework.core.PTSPView;
