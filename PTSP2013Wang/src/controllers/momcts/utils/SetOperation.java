@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+
 /**
  * This class contains functions that are used in operating elements in different kinds of containers
  * @author wj
@@ -168,39 +169,33 @@ public class SetOperation {
 		return sortItems(ks,vs, true);
 	}
 	
-	public static <K,V> K getBestItem(Vector<K> ks, Vector<V> vs, boolean max){
-		return sortItems(ks, vs, max).lastElement();
+	public static <K,V extends Comparable<V>> K getBestItem(Vector<K> ks, Vector<V> vs, boolean max){
+		int bestInd = getBestItemInd(vs, max);
+		return ks.get(bestInd);
 	}
 	
-	public static <K,V> K getBestItem(Map<K,V> mp, boolean max){
+	public static <K,V extends Comparable<V>> K getBestItem(Map<K,V> mp, boolean max){
 		return sortItems(mp, max).lastElement();
 	}
 	
-	public static <K,V> K maxItem(Vector<K> ks, Vector<V> vs){
+	public static <K,V extends Comparable<V>> K maxItem(Vector<K> ks, Vector<V> vs){
 		return getBestItem(ks,vs, true);
 	}
 	
-	public static <K,V> K maxItem(Map<K,V> mp){
+	public static <K,V extends Comparable<V>> K maxItem(Map<K,V> mp){
 		return getBestItem(mp, true);
 	}
 
-	public static <K,V> K minItem(Vector<K> ks, Vector<V> vs){
+	public static <K,V extends Comparable<V>> K minItem(Vector<K> ks, Vector<V> vs){
 		return getBestItem(ks,vs, false);
 	}
 	
-	public static <K,V> K minItem(Map<K,V> mp){
+	public static <K,V extends Comparable<V>> K minItem(Map<K,V> mp){
 		return getBestItem(mp, false);
 	}
 	
-	
 	public static <T extends Comparable<T>> T getBestItem(Vector<T> v, boolean maximize){
-		T best = randomElement(v);
-		for(T el : v){
-			//Collections.
-			if(maximize && el.compareTo(best) > 0) best = el;
-			else if(!maximize && el.compareTo(best) < 0) best = el;
-		}
-		return best;
+		return v.get(getBestItemInd(v, maximize));
 	}
 	
 	public static <T extends Comparable<T>> T maxItem(Vector<T> v){
@@ -209,6 +204,15 @@ public class SetOperation {
 	
 	public static <T extends Comparable<T>> T minItem(Vector<T> v){
 		return getBestItem(v, false);
+	}
+	
+	public static <T extends Comparable<T>> int getBestItemInd(Vector<T> v, boolean maximize){
+		int bestInd = MathOperation.rndInt(v.size());
+		for(int i=0; i<v.size();i++){
+			if(maximize && v.get(i).compareTo(v.get(bestInd)) > 0) bestInd = i;
+			else if(!maximize && v.get(i).compareTo(v.get(bestInd)) < 0) bestInd = i;
+		}
+		return bestInd;	
 	}
 	
 	/**
@@ -491,9 +495,24 @@ public class SetOperation {
 		double sum = 0;
 		for(int i=0; i<v.size();i++){
 			sum += v.get(i)*wts.get(i%wts.size());
+			//Debug.debug(v.get(i)+":"+sum);
+		}
+		//Presentation.spr();
+		return sum;
+	}
+	
+	public static double sumSeq(Vector<Double> v){
+		double sum = 0;
+		for(double d : v){
+			sum += d;
 		}
 		return sum;
 	}
+	
+	public static double avgSeq(Vector<Double> v){
+		return sumSeq(v)/v.size();
+	}
+
 	//---------end of vector operations-----------
 
 	//---------matrix operations----------
@@ -643,6 +662,7 @@ public class SetOperation {
 	public void testComparison(){
 		System.out.println(isBetter(5.0,5.0,true, false));
 	}
+	
 	//---------end of Test Programs--------------
 	
 	public static void main(String[] args){

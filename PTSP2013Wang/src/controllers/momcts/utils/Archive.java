@@ -3,6 +3,9 @@ package controllers.momcts.utils;
 import java.util.HashMap;
 import java.util.Vector;
 
+import controllers.momcts.MOOTools;
+
+
 /**
  * This class maintains a non-dominated point set (Vector<Double>) and operates on these points
  * @author wj
@@ -131,7 +134,18 @@ public class Archive {
 	
 	public Vector<Double> getBestPoint(Vector<Double> wts, boolean maximize){
 		Vector<Double> rks = getPointScores(wts);
-		return SetOperation.getBestItem(points, rks, maximize);		
+		int bestInd = SetOperation.getBestItemInd(rks, maximize);
+		//Presentation.showSeq(rks);Debug.debug(bestInd+" "+maximize);
+		return points.get(bestInd);
+		//return SetOperation.getBestItem(points, rks, maximize);		
+	}
+	
+	public void showPointScores(Vector<Double> wts){
+		Vector<Double> rks = getPointScores(wts);
+		for(int i=0; i<points.size();i++){
+			Presentation.showSeq(points.get(i)); System.out.println(":"+rks.get(i));
+		}
+		Presentation.spr();
 	}
 	
 	public double getBestScore(Vector<Double> wts, boolean maximize){

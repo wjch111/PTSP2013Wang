@@ -49,4 +49,21 @@ public class MathOperation {
 		return rnd.nextDouble();
 	}
 	
+	/**
+	 * Draw a random variable uniformly distributed between [0,1), if such variable is smaller than p, return 1, else, return 0
+	 * @param p
+	 * @return
+	 */
+	public static boolean bernouilli(double p){
+		if(rand1() < p) return true;
+		else return false;
+ 	}
+	
+	public static void main(String[] args){
+		for(int i=0; i< 100; i++){
+			if(i%20==0) System.out.println();
+			if(bernouilli(0.1)) System.out.print(1);
+			else System.out.print(0);			
+		}
+	}
 }

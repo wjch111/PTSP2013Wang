@@ -3,6 +3,7 @@ package controllers.momcts.utils;
 import java.util.Map;
 import java.util.Vector;
 
+
 /**
  * This class contains all functions that are used to facilitate the presentation
  * of strings and numbers in console mode of java programs
@@ -102,9 +103,9 @@ public class Presentation {
 	 */
 	//TODO to correct the not sishewuru pb
 	public static double ndigits(double nb, int precision){
-		double base = (int) Math.pow(10, precision);
+		double base = Math.pow(10, precision);
 		double mul = nb*base;
-		if(mul < 1.0) return 0;
+		if(Math.abs(mul) < 1.0) return 0;
 		else return Math.round(mul)/base;
 	}
 	
@@ -113,8 +114,8 @@ public class Presentation {
 	}
 	
 	public static void main(String[] args){
-		double a = 4.423782231483507E-9;
-		System.out.println(ndigits(a,3));
+		double a = -408.0268655544048;
+		System.out.println(ndigits(a));
 	}
 	
 }

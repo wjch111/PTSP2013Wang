@@ -1,10 +1,15 @@
 10
 
 dir
-0
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao/MoMCTS/PTSPcomptetition/PTSP2013Wang/src/controllers
-svn+ssh://weijia@scm.gforge.inria.fr/svnroot/tao
-add
+9
+http://the-mo-ptsp-competition.googlecode.com/svn/trunk/src/controllers
+http://the-mo-ptsp-competition.googlecode.com/svn
+
+
+
+2013-05-30T10:24:06.084561Z
+9
+akilascartas@gmail.com
 
 
 
@@ -19,52 +24,23 @@ add
 
 
 
-
-
-
-
-
-877838cd-bf58-0410-90ef-fec0a358d40a
-
-keycontroller
-dir
-
-
-
-add
-
-greedy
-dir
-
-
-
-add
+4d069701-eb4c-8d9b-a916-ddb3fb62bb1f
 
 random
 dir
-
-
-
-add
 
 WoxController
 dir
-
-
-
-add
 
 MacroRandomSearch
 dir
-
-
-
-add
 
 lineofsight
 dir
-
-
-
-add
+
+keycontroller
+dir
+
+greedy
+dir
 

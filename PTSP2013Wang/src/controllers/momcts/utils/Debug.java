@@ -2,11 +2,21 @@ package controllers.momcts.utils;
 
 import java.util.Vector;
 
+
 public class Debug {
+	private static boolean debugOn = true;
 	public int counter;
 	public long currentTime = -1;
 	public long initMemory = -1;
+	
+	public void turnOnDebug(){
+		debugOn = true;
+	}
 
+	public void turnOffDebug(){
+		debugOn = false;
+	}
+	
 	/**
 	* Each time a stopWatch() function is called, it returns the time interval between the current time and the last time the stopWatch() is called
 	*/
@@ -44,11 +54,11 @@ public class Debug {
 	
 	
 	public static void debug(){
-		System.out.println("=OK=");		
+		if(debugOn) System.out.println("=OK=");		
 	}
 	
 	public static void debug(String s, String deco){
-		System.out.println(deco+s+deco);
+		if(debugOn) System.out.println(deco+s+deco);
 	}
 	
 	public static void debug(String s){
@@ -64,10 +74,10 @@ public class Debug {
 	}
 	
 	public static void showSeq(Vector<Integer> is){
-		Presentation.showSeq(is);
+		if(debugOn) Presentation.showSeq(is);
 	}
 	
 	public void showCounter(){
-		System.out.println(counter);
+		if(debugOn) System.out.println(counter);
 	}
 }

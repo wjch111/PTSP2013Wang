@@ -53,7 +53,7 @@ public abstract class PTSPConstants
      * If the controller spends more than TIME_ACTION_DISQ to reply with an action,
      * it gets disqualified from this game (getting 0 wp and getStepsPerWaypoints() time steps.)
      */
-    public final static int TIME_ACTION_DISQ = ACTION_TIME_MS * 3;//
+    public final static int TIME_ACTION_DISQ = ACTION_TIME_MS * 10;//3;
     
     /**
      * Interval wait. Used to check for controller replies in some execution modes.

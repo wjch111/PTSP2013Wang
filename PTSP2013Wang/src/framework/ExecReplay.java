@@ -1,8 +1,5 @@
 package framework;
-import controllers.momcts.utils.Debug;
-import framework.core.Exec;
-import framework.core.Game;
-import framework.core.PTSPView;
+import framework.core.*;
 import framework.utils.JEasyFrame;
 
 /**
@@ -81,16 +78,13 @@ public class ExecReplay extends Exec
      */
     public static void main(String[] args)
     {
-    	Debug dbg = new Debug();
-    	dbg.debug();
-        m_mapName = "maps/ptsp_map01.map";  //Set here the name of the map to play in.
-        m_actionFilename = "example_route_map01.txt"; //Indicate here the name of the file with the actions saved TO SEE a replay.
+
+        m_mapName = "maps/ptsp_map02.map";  //Set here the name of the map to play in.
+        m_actionFilename = "def"; //Indicate here the name of the file with the actions saved TO SEE a replay.
         m_visibility = true; //Set here if the graphics must be displayed or not (for those modes where graphics are allowed).
         m_verbose = true;
         //m_warmUpTime = 750; //Change this to modify the wait time (in milliseconds) before starting the game in a visual mode
 
-        System.out.println("perfect");
-        
         /////// 1. Executes a replay.
         /////// Note: using a delay 0: quickest, 1:quickest (seeing something!), PTSPConstants.DELAY: human play speed,
         // //PTSPConstants.ACTION_TIME_MS: max. controller delay

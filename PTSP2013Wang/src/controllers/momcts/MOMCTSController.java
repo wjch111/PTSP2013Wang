@@ -2,7 +2,6 @@ package controllers.momcts;
 
 //import controllers.utils.Debug;
 import controllers.momcts.utils.Debug;
-import controllers.momcts.utils.Presentation;
 import framework.core.Controller;
 import framework.core.Game;
 import framework.graph.Graph;
@@ -76,6 +75,8 @@ public class MOMCTSController extends Controller{
         m_tspGraph.solve();
         m_bestRoute = m_tspGraph.getBestPath();
         wptVistNb = a_game.getWaypointsLeft();
+
+        dbg.resetMemoryCount();
     }
     
 	@Override
@@ -88,19 +89,16 @@ public class MOMCTSController extends Controller{
 
         if(cycle == 0){
             //First cycle of a match is special, we need to execute any action to start looking for the next one.
-            m_macroActionUnderExecution = 0;
+            m_macroActionUnderExecution = 1;
             nextMacroAction = m_macroActionUnderExecution;
             m_lastMacroActionExecuted = m_macroActionUnderExecution;
             m_resetRS = true;
-            m_executedMacroActionNb = ShortNavigator.MACRO_ACTION_LENGTH-1;
-            
-            dbg.resetMemoryCount();
+            m_executedMacroActionNb = ShortNavigator.MACRO_ACTION_LENGTHs[m_macroActionUnderExecution]-1;
+            //dbg.resetMemoryCount();
         } else {
             //advance the game until the last action of the macro action
             prepareGameCopy(a_game);
-
             if(m_executedMacroActionNb > 0){
-                dbg.stopWatch();
             	if(m_resetRS){
                     //search needs to be restarted.
                     m_p2pNivgator.init(m_lastMacroActionExecuted);
@@ -120,7 +118,7 @@ public class MOMCTSController extends Controller{
                 if(suggestedAction != -1){
                 	m_lastMacroActionExecuted = m_macroActionUnderExecution;
                 	m_macroActionUnderExecution = suggestedAction;
-                	m_executedMacroActionNb = ShortNavigator.MACRO_ACTION_LENGTH-1;
+                	m_executedMacroActionNb = ShortNavigator.MACRO_ACTION_LENGTHs[m_macroActionUnderExecution]-1;
                 }
             }else{
             	throw new RuntimeException("This should not be happening: " + m_executedMacroActionNb);
@@ -140,8 +138,8 @@ public class MOMCTSController extends Controller{
         //If there is a macro action being executed now.
         if(m_macroActionUnderExecution != -1){
             //Find out how long have we executed this macro-action
-            int first = ShortNavigator.MACRO_ACTION_LENGTH - m_executedMacroActionNb - 1;
-            for(int i = first; i < ShortNavigator.MACRO_ACTION_LENGTH; i++){
+            int first = ShortNavigator.MACRO_ACTION_LENGTHs[m_macroActionUnderExecution] - m_executedMacroActionNb - 1;
+            for(int i = first; i < ShortNavigator.MACRO_ACTION_LENGTHs[m_macroActionUnderExecution]; i++){
                 //make the moves to advance the game state.
                 a_game.tick(m_macroActionUnderExecution);
             }
